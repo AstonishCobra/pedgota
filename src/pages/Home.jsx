@@ -11,7 +11,7 @@ const categoryConfig = {
     border: 'border-amber-500/20 hover:border-amber-500/50',
     bg: 'hover:bg-amber-500/5',
     badge: 'bg-amber-500/15 text-amber-300',
-    dot: 'bg-amber-400',
+    dot: 'bg-amber-400'
   },
   [DRUG_CATEGORIES.SEDATIVE]: {
     label: 'Sedativos / Analgésicos',
@@ -20,7 +20,7 @@ const categoryConfig = {
     border: 'border-indigo-500/20 hover:border-indigo-500/50',
     bg: 'hover:bg-indigo-500/5',
     badge: 'bg-indigo-500/15 text-indigo-300',
-    dot: 'bg-indigo-400',
+    dot: 'bg-indigo-400'
   },
   [DRUG_CATEGORIES.BNM]: {
     label: 'Bloqueadores Neuromusculares',
@@ -29,22 +29,22 @@ const categoryConfig = {
     border: 'border-red-500/20 hover:border-red-500/50',
     bg: 'hover:bg-red-500/5',
     badge: 'bg-red-500/15 text-red-300',
-    dot: 'bg-red-400',
-  },
+    dot: 'bg-red-400'
+  }
 };
 
 const categoryOrder = [
-  DRUG_CATEGORIES.VASOACTIVE,
-  DRUG_CATEGORIES.SEDATIVE,
-  DRUG_CATEGORIES.BNM,
-];
+DRUG_CATEGORIES.VASOACTIVE,
+DRUG_CATEGORIES.SEDATIVE,
+DRUG_CATEGORIES.BNM];
+
 
 export default function Home() {
   const [search, setSearch] = useState('');
 
   const filteredDrugs = drugs.filter((d) =>
-    d.name.toLowerCase().includes(search.toLowerCase()) ||
-    d.therapeuticClass.toLowerCase().includes(search.toLowerCase())
+  d.name.toLowerCase().includes(search.toLowerCase()) ||
+  d.therapeuticClass.toLowerCase().includes(search.toLowerCase())
   );
 
   const groupedDrugs = categoryOrder.reduce((acc, cat) => {
@@ -67,7 +67,7 @@ export default function Home() {
               <p className="text-xs text-slate-500">Infusões Contínuas em Pediatria</p>
             </div>
           </div>
-          <p className="text-sm text-slate-500 mt-3 leading-relaxed">
+          <p className="text-sm text-slate-500 mt-3 leading-relaxed hidden">
             Calcule doses e gere prescrições de infusão contínua baseadas no Guia Pediátrico.
           </p>
 
@@ -79,8 +79,8 @@ export default function Home() {
               placeholder="Buscar droga..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-4 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-slate-500"
-            />
+              className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-4 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-slate-500" />
+            
           </div>
         </div>
       </div>
@@ -98,21 +98,21 @@ export default function Home() {
                 </h2>
               </div>
               <div className="space-y-2">
-                {drugList.map((drug) => (
-                  <Link
-                    key={drug.id}
-                    to={`/drug/${drug.id}`}
-                    className={`flex items-center gap-4 p-4 rounded-xl border bg-slate-800/40 transition-all duration-150 ${cfg.border} ${cfg.bg}`}
-                  >
+                {drugList.map((drug) =>
+                <Link
+                  key={drug.id}
+                  to={`/drug/${drug.id}`}
+                  className={`flex items-center gap-4 p-4 rounded-xl border bg-slate-800/40 transition-all duration-150 ${cfg.border} ${cfg.bg}`}>
+                  
                     <div className={`w-2 h-2 rounded-full flex-shrink-0 ${cfg.dot}`} />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-semibold text-slate-100">{drug.name}</span>
-                        {drug.alerts.length > 0 && (
-                          <span className="text-xs bg-red-500/20 text-red-300 border border-red-500/30 px-1.5 py-0.5 rounded font-medium">
+                        {drug.alerts.length > 0 &&
+                      <span className="text-xs bg-red-500/20 text-red-300 border border-red-500/30 px-1.5 py-0.5 rounded font-medium">
                             ⚠ Alerta
                           </span>
-                        )}
+                      }
                       </div>
                       <p className="text-xs text-slate-500 mt-0.5 truncate">{drug.presentation}</p>
                     </div>
@@ -123,24 +123,24 @@ export default function Home() {
                       <div className="text-xs text-slate-600">{drug.doseUnit}</div>
                     </div>
                   </Link>
-                ))}
+                )}
               </div>
-            </section>
-          );
+            </section>);
+
         })}
 
-        {filteredDrugs.length === 0 && (
-          <div className="text-center py-12">
+        {filteredDrugs.length === 0 &&
+        <div className="text-center py-12">
             <p className="text-slate-600">Nenhuma droga encontrada para "{search}"</p>
           </div>
-        )}
+        }
 
         {/* Tabela comparativa */}
         <div className="border-t border-slate-800 pt-6">
           <Link
             to="/comparative"
-            className="flex items-center gap-3 p-4 rounded-xl border border-slate-700 bg-slate-800/30 hover:bg-slate-800/60 hover:border-slate-600 transition-all"
-          >
+            className="flex items-center gap-3 p-4 rounded-xl border border-slate-700 bg-slate-800/30 hover:bg-slate-800/60 hover:border-slate-600 transition-all">
+            
             <div className="w-9 h-9 rounded-lg bg-slate-700 flex items-center justify-center flex-shrink-0">
               <Table2 size={17} className="text-slate-400" />
             </div>
@@ -157,6 +157,6 @@ export default function Home() {
           Confirme sempre com protocolos institucionais e julgamento clínico.
         </p>
       </div>
-    </div>
-  );
+    </div>);
+
 }
