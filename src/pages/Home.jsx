@@ -63,7 +63,7 @@ export default function Home() {
               <Activity size={18} className="text-amber-400" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-slate-100 tracking-tight">PedDrop</h1>
+              <h1 className="text-xl font-bold text-slate-100 tracking-tight">PedDrip</h1>
               <p className="text-xs text-slate-500">Infusões Contínuas em Pediatria</p>
             </div>
           </div>
