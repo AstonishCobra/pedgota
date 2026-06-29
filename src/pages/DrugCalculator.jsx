@@ -19,7 +19,7 @@ const categoryColor = {
     label: 'Vasoativa',
   },
   [DRUG_CATEGORIES.SEDATIVE]: {
-    accent: '#6366F1',
+    accent: 'hsl(var(--secondary))',
     bg: 'bg-indigo-500/10',
     border: 'border-indigo-500/30',
     text: 'text-indigo-400',
@@ -27,7 +27,7 @@ const categoryColor = {
     label: 'Sedativo/Analgésico',
   },
   [DRUG_CATEGORIES.BNM]: {
-    accent: '#EF4444',
+    accent: 'hsl(var(--destructive))',
     bg: 'bg-red-500/10',
     border: 'border-red-500/30',
     text: 'text-red-400',
