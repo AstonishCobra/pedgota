@@ -92,7 +92,7 @@ export default function Home() {
           return (
             <section key={cat}>
               <div className="flex items-center gap-2 mb-3">
-                <span>{cfg.icon}</span>
+                <span className="hidden">{cfg.icon}</span>
                 <h2 className={`text-xs font-bold uppercase tracking-widest ${cfg.accent}`}>
                   {cfg.label}
                 </h2>
