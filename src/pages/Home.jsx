@@ -67,9 +67,9 @@ export default function Home() {
               <p className="text-xs text-slate-500">Infusões Contínuas em Pediatria</p>
             </div>
           </div>
-          <p className="text-sm text-slate-500 mt-3 leading-relaxed hidden">
-            Calcule doses e gere prescrições de infusão contínua baseadas no Guia Pediátrico.
-          </p>
+          
+
+          
 
           {/* Search */}
           <div className="relative mt-4">
