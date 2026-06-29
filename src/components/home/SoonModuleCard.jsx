@@ -18,7 +18,7 @@ export default function SoonModuleCard({ module }) {
             Em breve
           </span>
         </div>
-        <p className="text-xs text-slate-500 mt-0.5 hidden">{module.subtitle}</p>
+        
       </div>
       <ChevronRight size={16} className="text-slate-700 flex-shrink-0" />
     </div>);
