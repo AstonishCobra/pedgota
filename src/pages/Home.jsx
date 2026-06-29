@@ -73,7 +73,7 @@ function CategoryCard({ cat, drugList, cfg }) {
         </div>
         <div className="flex-1 min-w-0">
           <h2 className="font-bold text-slate-100 text-base leading-tight">{cfg.label}</h2>
-          <p className="text-xs text-slate-500 mt-0.5 hidden">{cfg.subtitle}</p>
+          
         </div>
         <div className="flex items-center gap-3 flex-shrink-0">
           <span className={`text-xs font-semibold px-2 py-1 rounded-full ${cfg.iconBg} ${cfg.accent}`}>
@@ -252,9 +252,9 @@ export default function Home() {
           </>
         }
 
-        <p className="text-xs text-slate-700 text-center pt-2 leading-relaxed hidden">
-          Baseado no Guia de Infusão Contínua em Pediatria · Use com julgamento clínico
-        </p>
+        
+
+        
       </div>
     </div>);
 
