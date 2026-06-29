@@ -62,13 +62,13 @@ function CategoryCard({ cat, drugList, cfg }) {
   const { Icon } = cfg;
 
   return (
-    <div className={`rounded-2xl border transition-all duration-200 overflow-hidden ${cfg.cardBorder} ${cfg.cardBg} ${cfg.cardHover}`}>
+    <div     className={`border transition-all duration-200 overflow-hidden ${cfg.cardBorder} ${cfg.cardBg} ${cfg.cardHover}`}>
       {/* Card header — clicável para expandir */}
       <button
         onClick={() => setExpanded(!expanded)}
         className="w-full flex items-center gap-4 p-5 text-left"
       >
-        <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${cfg.iconBg}`}>
+        <div className={`w-11 h-11 flex items-center justify-center flex-shrink-0 ${cfg.iconBg}`}>
           <Icon size={20} className={cfg.accent} />
         </div>
         <div className="flex-1 min-w-0">
@@ -148,7 +148,7 @@ export default function Home() {
       {/* Header */}
       <div className="max-w-xl mx-auto px-4 pt-10 pb-2">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center">
+          <div               className="w-10 h-10 bg-amber-500/15 border border-amber-500/30 flex items-center justify-center">
             <Activity size={20} className="text-amber-400" />
           </div>
           <div>
@@ -171,7 +171,7 @@ export default function Home() {
             placeholder="Buscar droga..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-slate-800/80 border border-slate-700 rounded-xl pl-10 pr-10 py-3 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-slate-500 transition-colors"
+            className="w-full bg-slate-800/80 border border-slate-700 pl-10 pr-10 py-3 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-slate-500 transition-colors"
           />
           {search && (
             <button
@@ -204,7 +204,7 @@ export default function Home() {
                         <Link
                           key={drug.id}
                           to={`/drug/${drug.id}`}
-                          className={`flex items-center gap-3 px-4 py-3.5 rounded-xl border bg-slate-800/40 transition-colors ${cfg.rowBorder} ${cfg.rowHover}`}
+                          className={`flex items-center gap-3 px-4 py-3.5 border bg-slate-800/40 transition-colors ${cfg.rowBorder} ${cfg.rowHover}`}
                         >
                           <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${cfg.dot}`} />
                           <div className="flex-1 min-w-0">
@@ -238,9 +238,9 @@ export default function Home() {
             {/* Tabela comparativa */}
             <Link
               to="/comparative"
-              className="flex items-center gap-4 p-5 rounded-2xl border border-slate-700/60 bg-slate-800/30 hover:bg-slate-800/60 hover:border-slate-600 transition-all"
+              className="flex items-center gap-4 p-5 border border-slate-700/60 bg-slate-800/30 hover:bg-slate-800/60 hover:border-slate-600 transition-all"
             >
-              <div className="w-11 h-11 rounded-xl bg-slate-700/60 flex items-center justify-center flex-shrink-0">
+              <div className="w-11 h-11 bg-slate-700/60 flex items-center justify-center flex-shrink-0">
                 <Table2 size={18} className="text-slate-400" />
               </div>
               <div className="flex-1">
