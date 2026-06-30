@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Lock, Eye, EyeOff, Activity } from 'lucide-react';
-import { checkPassword } from '@/lib/drugStore';
+import { checkPassword, setAdminSession } from '@/lib/drugStore';
 
 export default function AdminLogin({ onSuccess }) {
   const [pass, setPass] = useState('');
@@ -10,6 +10,7 @@ export default function AdminLogin({ onSuccess }) {
   function handleSubmit(e) {
     e.preventDefault();
     if (checkPassword(pass)) {
+      setAdminSession();
       onSuccess();
     } else {
       setError('Senha incorreta.');

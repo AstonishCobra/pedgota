@@ -149,3 +149,18 @@ export function changePassword(newPass) {
 export function isPasswordSet() {
   return !!localStorage.getItem(PASS_KEY);
 }
+
+// ── Sessão admin ──────────────────────────────────────────────────────────────
+const SESSION_KEY = 'pedidrip_admin_session';
+
+export function setAdminSession() {
+  sessionStorage.setItem(SESSION_KEY, '1');
+}
+
+export function clearAdminSession() {
+  sessionStorage.removeItem(SESSION_KEY);
+}
+
+export function isAdminSession() {
+  return sessionStorage.getItem(SESSION_KEY) === '1';
+}
