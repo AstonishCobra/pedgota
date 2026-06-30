@@ -217,6 +217,35 @@ export default function DrugCalculator() {
 
             {/* Resultado */}
             {result ? (
+              <>
+              {/* Aviso de volume insuficiente */}
+              {result.diluentVolumeMl < 0 && (() => {
+                const suggestedVol = VOLUME_OPTIONS.find((o) => o.value > result.drugVolumeMl);
+                return (
+                  <div className="rounded-xl border border-orange-500/40 bg-orange-500/10 p-4 space-y-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <AlertTriangle size={15} className="text-orange-400 flex-shrink-0" />
+                      <span className="text-orange-400 font-semibold text-sm uppercase tracking-wide">Volume insuficiente</span>
+                    </div>
+                    <p className="text-orange-200 text-sm leading-snug">
+                      O volume do fármaco ({result.drugVolumeMl} ml) excede o volume total de preparo ({totalVolume} ml).
+                    </p>
+                    {suggestedVol ? (
+                      <p className="text-orange-300 text-sm font-semibold mt-1">
+                        → Use o volume de preparo de <button
+                          onClick={() => setTotalVolume(suggestedVol.value)}
+                          className="underline underline-offset-2 hover:text-orange-100 transition-colors"
+                        >{suggestedVol.label} ({suggestedVol.rate})</button> ou superior.
+                      </p>
+                    ) : (
+                      <p className="text-orange-300 text-sm font-semibold mt-1">
+                        → Considere reduzir a dose ou aumentar o volume de preparo além de {VOLUME_OPTIONS[VOLUME_OPTIONS.length - 1].label}.
+                      </p>
+                    )}
+                  </div>
+                );
+              })()}
+
               <div className="rounded-xl border border-slate-700 bg-slate-800/50 overflow-hidden">
                 {/* Números resumo */}
                 <div className="grid grid-cols-3 divide-x divide-slate-700 border-b border-slate-700">
@@ -227,7 +256,7 @@ export default function DrugCalculator() {
                     <div className="text-xs text-slate-500 mt-1">ml do fármaco</div>
                   </div>
                   <div className="p-4 text-center">
-                    <div className="text-2xl font-bold text-slate-300">
+                    <div className={`text-2xl font-bold ${result.diluentVolumeMl < 0 ? 'text-orange-400' : 'text-slate-300'}`}>
                       {result.diluentVolumeMl}
                     </div>
                     <div className="text-xs text-slate-500 mt-1">ml de {drug.diluent}</div>
@@ -268,6 +297,7 @@ export default function DrugCalculator() {
                   </div>
                 </div>
               </div>
+              </>
             ) : (
               <div className="rounded-xl border border-slate-800 bg-slate-800/30 p-8 text-center">
                 <p className="text-slate-500 text-sm">Informe o peso e a dose para calcular</p>
