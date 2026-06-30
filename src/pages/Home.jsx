@@ -83,9 +83,9 @@ export default function Home() {
       {/* Header */}
       <div className="max-w-xl mx-auto px-4 pt-10 pb-2">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 bg-amber-500/15 border border-amber-500/30 flex items-center justify-center hidden">
-            <Activity size={20} className="text-amber-400" />
-          </div>
+          
+
+          
           <div>
             <h1 className="text-2xl font-bold text-slate-100 tracking-tight leading-none">Pedgota</h1>
             <p className="text-xs text-slate-500 mt-0.5">Infusões Contínuas em Pediatria</p>
