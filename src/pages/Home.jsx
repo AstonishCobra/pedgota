@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Activity, ChevronRight, Table2, X } from 'lucide-react';
-import { drugs } from '@/data/drugs';
+import { Activity, ChevronRight, Table2, X, Settings } from 'lucide-react';
+import { getDrugs } from '@/lib/drugStore';
+const drugs = getDrugs();
 import { MODULE_REGISTRY, MODULE_TYPES, PALETTES } from '@/modules/registry';
 import InfusionModuleCard from '@/components/home/InfusionModuleCard';
 import SoonModuleCard from '@/components/home/SoonModuleCard';
@@ -158,6 +159,13 @@ export default function Home() {
             )}
           </>
         )}
+        {/* Link discreto para painel admin */}
+        <div className="pt-4 text-center">
+          <Link to="/admin" className="inline-flex items-center gap-1.5 text-xs text-slate-700 hover:text-slate-500 transition-colors">
+            <Settings size={11} /> Admin
+          </Link>
+        </div>
+
       </div>
     </div>
   );

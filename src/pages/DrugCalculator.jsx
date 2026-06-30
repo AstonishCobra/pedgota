@@ -1,6 +1,8 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { drugs, calculateDrug, DRUG_CATEGORIES } from '@/data/drugs';
+import { calculateDrug, DRUG_CATEGORIES } from '@/data/drugs';
+import { getDrugs } from '@/lib/drugStore';
+const drugs = getDrugs();
 import { Copy, Check, ChevronLeft, AlertTriangle, Info, Zap } from 'lucide-react';
 
 const VOLUME_OPTIONS = [

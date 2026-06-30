@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
-import { drugs } from '@/data/drugs';
+import { getDrugs } from '@/lib/drugStore';
+const drugs = getDrugs();
 import { PALETTES } from '@/modules/registry';
 import ModuleIcon from './ModuleIcon';
 
