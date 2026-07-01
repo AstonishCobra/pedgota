@@ -66,6 +66,12 @@ export default function DrugCalculator() {
     return calculateDrug(drug, w, d, totalVolume);
   }, [drug, weight, dose, totalVolume]);
 
+  const doseValue = parseFloat(dose);
+  const isDoseOutOfRange = drug && !isNaN(doseValue) && (doseValue < drug.doseMin || doseValue > drug.doseMax);
+
+  const weightValue = parseFloat(weight);
+  const isWeightUnusual = !isNaN(weightValue) && weightValue > 50;
+
   const handleCopy = useCallback(() => {
     if (!result) return;
     const text = result.prescriptionLines.join('\n');
@@ -187,6 +193,26 @@ export default function DrugCalculator() {
                   </p>
                 </div>
               </div>
+
+              {/* Alerta: dose fora da faixa */}
+              {isDoseOutOfRange && (
+                <div className="flex items-start gap-2 rounded-lg border border-red-500/40 bg-red-500/10 p-3">
+                  <AlertTriangle size={15} className="text-red-400 flex-shrink-0 mt-0.5" />
+                  <p className="text-red-300 text-sm leading-snug">
+                    Dose de {dose} {drug.doseUnit} está fora da faixa recomendada ({drug.doseMin}–{drug.doseMax} {drug.doseUnit}).
+                  </p>
+                </div>
+              )}
+
+              {/* Alerta: peso incomum para pediatria */}
+              {isWeightUnusual && (
+                <div className="flex items-start gap-2 rounded-lg border border-orange-500/40 bg-orange-500/10 p-3">
+                  <AlertTriangle size={15} className="text-orange-400 flex-shrink-0 mt-0.5" />
+                  <p className="text-orange-300 text-sm leading-snug">
+                    Peso de {weight} kg é incomum para a faixa pediátrica. Confira o peso informado.
+                  </p>
+                </div>
+              )}
 
               {/* Dose tips */}
               {drug.doseTips && (
