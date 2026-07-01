@@ -88,7 +88,7 @@ export default function Home() {
           
           <div>
             <h1 className="text-2xl font-bold text-slate-100 tracking-tight leading-none">Pedgota</h1>
-            <p className="text-xs text-slate-500 mt-0.5 hidden">Infusões Contínuas em Pediatria</p>
+            
           </div>
         </div>
 
