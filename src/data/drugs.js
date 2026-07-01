@@ -1,6 +1,9 @@
+import { SETTINGS } from './settings';
+
 export const DRUG_CATEGORIES = {
-  VASOACTIVE: 'vasoativa',
-  SEDATIVE: 'sedativa',
+  VASOACTIVE: 'vasoativas',
+  SEDATIVE: 'sedacao',
+  ANALGESIA: 'analgesia',
   BNM: 'bnm',
 };
 
@@ -33,14 +36,10 @@ export const drugs = [
       'Monitorar FC, PA, ECG e perfusão periférica continuamente',
     ],
     alerts: [],
-    diluent: 'SF 0,9%',
-    // Fórmula: Dose × Peso × 1,44 = ml do fármaco (para 24h a 1ml/h)
-    calcType: 'standard_1_44',
-    concentration_mg_per_ml: 1, // 1 mg/ml
-    doseUnitIsMilligram: false, // dose em mcg → sem divisão extra
-    // "doseUnitIsMilligram: false" e concentration_mg_per_ml = 1 significa:
-    //   volume_farmaco = dose(mcg/kg/min) × peso × 1.44   [ml]
-    //   (adrenalina: 1 mg/ml, dose em mcg → resultado direto em ml)
+    algorithm: 'VASOACTIVE_STANDARD',
+    concentration: { value: 1, unit: 'mg/ml' },
+    preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
+    references: ['guide2026'],
     calcNote: 'Dose × Peso × 1,44 = ml do fármaco para 24h a 1 ml/h',
   },
   {
@@ -69,10 +68,10 @@ export const drugs = [
       'Garantir reposição volêmica adequada antes do início',
     ],
     alerts: [],
-    diluent: 'SF 0,9%',
-    calcType: 'standard_1_44',
-    concentration_mg_per_ml: 1,
-    doseUnitIsMilligram: false,
+    algorithm: 'VASOACTIVE_STANDARD',
+    concentration: { value: 1, unit: 'mg/ml' },
+    preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
+    references: ['guide2026'],
     calcNote: 'Dose × Peso × 1,44 = ml do fármaco para 24h a 1 ml/h',
   },
   {
@@ -105,10 +104,10 @@ export const drugs = [
       'Evitar uso prolongado em altas doses (risco de isquemia)',
     ],
     alerts: [],
-    diluent: 'SF 0,9%',
-    calcType: 'mg_divided',
-    concentration_mg_per_ml: 5, // 5 mg/ml
-    doseUnitIsMilligram: false, // dose em mcg → converte: ×1,44 → mg → ÷ conc
+    algorithm: 'VASOACTIVE_STANDARD',
+    concentration: { value: 5, unit: 'mg/ml' },
+    preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
+    references: ['guide2026'],
     calcNote: 'Dose × Peso × 1,44 = mg → ÷ 5 (mg/ml) = ml do fármaco',
   },
   {
@@ -138,10 +137,10 @@ export const drugs = [
       'Pode ser usada em acesso periférico de curto prazo; preferir acesso central',
     ],
     alerts: [],
-    diluent: 'SF 0,9%',
-    calcType: 'mg_divided',
-    concentration_mg_per_ml: 12.5,
-    doseUnitIsMilligram: false,
+    algorithm: 'VASOACTIVE_STANDARD',
+    concentration: { value: 12.5, unit: 'mg/ml' },
+    preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
+    references: ['guide2026'],
     calcNote: 'Dose × Peso × 1,44 = mg → ÷ 12,5 (mg/ml) = ml do fármaco',
   },
   {
@@ -170,10 +169,11 @@ export const drugs = [
       'Associar à noradrenalina na maioria dos casos; não substitui o vasopressor principal',
     ],
     alerts: [],
-    diluent: 'SF 0,9%',
-    calcType: 'vasopressina',
+    algorithm: 'VASOPRESSIN',
+    concentration: { value: 20, unit: 'UI/ml' },
+    preparation: { diluent: 'SF 0,9%', finalVolume: 50 },
+    references: ['guide2026'],
     // Diluição padrão: 1ml (20UI) + 49ml SF = 50ml → concentração 0,4 UI/ml
-    // volume = dose × peso × 24 / 0.4   → velocidade = volume / 24
     calcNote: 'Dose × Peso × 24 = UI totais → ÷ 0,4 (UI/ml) = volume para 24h → velocidade em ml/h',
   },
   {
@@ -203,10 +203,10 @@ export const drugs = [
       'Monitorar pressão arterial de forma contínua',
     ],
     alerts: [],
-    diluent: 'SF 0,9%',
-    calcType: 'standard_1_44',
-    concentration_mg_per_ml: 1,
-    doseUnitIsMilligram: false,
+    algorithm: 'VASOACTIVE_STANDARD',
+    concentration: { value: 1, unit: 'mg/ml' },
+    preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
+    references: ['guide2026'],
     calcNote: 'Dose × Peso × 1,44 = ml do fármaco para 24h a 1 ml/h',
   },
   {
@@ -244,19 +244,19 @@ export const drugs = [
       'Evitar infusão >72h',
       'Cautela em insuficiência renal ou hepática (↑risco de toxicidade)',
     ],
-    alerts: ['FOTOSSENSÍVEL — proteger da luz com equipo fotoprotetor', 'Dose máxima 10 mcg/kg/min por curto período (toxicidade por cianeto)'],
-    diluent: 'SG 5%',
-    calcType: 'mg_divided',
-    concentration_mg_per_ml: 25,
-    doseUnitIsMilligram: false,
+    alerts: ['photoprotection', 'cyanide_toxicity_risk'],
+    algorithm: 'VASOACTIVE_STANDARD',
+    concentration: { value: 25, unit: 'mg/ml' },
+    preparation: { diluent: 'SG 5%', finalVolume: 24 },
+    references: ['guide2026'],
     calcNote: 'Dose × Peso × 1,44 = mg → ÷ 25 (mg/ml) = ml do fármaco. Diluente: SG 5%',
   },
 
-  // ─── SEDATIVOS / ANALGÉSICOS ──────────────────────────────────────────────
+  // ─── ANALGESIA ─────────────────────────────────────────────────────────────
   {
     id: 'fentanil',
     name: 'Fentanil',
-    category: DRUG_CATEGORIES.SEDATIVE,
+    category: DRUG_CATEGORIES.ANALGESIA,
     presentation: 'Ampola 0,05 mg/ml (50 mcg/ml)',
     therapeuticClass: 'Opioide analgésico potente',
     mechanism:
@@ -279,12 +279,14 @@ export const drugs = [
       'Retirar gradualmente se uso prolongado (risco de abstinência)',
     ],
     alerts: [],
-    diluent: 'SF 0,9%',
-    calcType: 'fentanil',
-    // Dose × Peso × 24 = mcg totais → ÷ 50 (mcg/ml) = ml
-    concentration_mcg_per_ml: 50,
+    algorithm: 'SEDATION_STANDARD',
+    concentration: { value: 50, unit: 'mcg/ml' },
+    preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
+    references: ['guide2026'],
     calcNote: 'Dose × Peso × 24 = mcg totais → ÷ 50 (mcg/ml) = ml do fármaco',
   },
+
+  // ─── SEDAÇÃO ────────────────────────────────────────────────────────────────
   {
     id: 'midazolam',
     name: 'Midazolam',
@@ -315,10 +317,10 @@ export const drugs = [
       'Fazer desmame gradual para evitar abstinência',
     ],
     alerts: [],
-    diluent: 'SF 0,9%',
-    calcType: 'midazolam',
-    // Dose × Peso × 24 = mg → ÷ 5 (mg/ml) = ml
-    concentration_mg_per_ml: 5,
+    algorithm: 'SEDATION_STANDARD',
+    concentration: { value: 5, unit: 'mg/ml' },
+    preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
+    references: ['guide2026'],
     calcNote: 'Dose × Peso × 24 = mg → ÷ 5 (mg/ml) = ml do fármaco',
   },
   {
@@ -352,10 +354,10 @@ export const drugs = [
       'Monitorização rigorosa da via aérea e nível de sedação',
     ],
     alerts: [],
-    diluent: 'SF 0,9%',
-    calcType: 'cetamina',
-    // Dose × Peso × 1,44 = mg → ÷ 50 = ml
-    concentration_mg_per_ml: 50,
+    algorithm: 'VASOACTIVE_STANDARD',
+    concentration: { value: 50, unit: 'mg/ml' },
+    preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
+    references: ['guide2026'],
     calcNote: 'Dose × Peso × 1,44 = mg → ÷ 50 (mg/ml) = ml do fármaco',
   },
   {
@@ -389,11 +391,12 @@ export const drugs = [
       'Evitar em bradicardia importante ou bloqueios AV grau 2 ou 3',
       'Boa opção para sedação leve a moderada em UTI pediátrica',
     ],
-    alerts: ['Evitar dose de ataque em crianças — risco de bradicardia e hipotensão'],
-    diluent: 'SF 0,9%',
-    calcType: 'dexmedetomidina',
+    alerts: ['no_loading_dose'],
+    algorithm: 'DEXMEDETOMIDINE',
+    concentration: { value: 100, unit: 'mcg/ml' },
+    preparation: { diluent: 'SF 0,9%', finalVolume: 50 },
+    references: ['guide2026'],
     // Diluição padrão fixa: 2ml (200mcg) + 48ml SF = 50ml → 4 mcg/ml
-    // Velocidade = Dose × Peso ÷ 4 ml/h
     calcNote: 'Diluição padrão: 2 ml (200 mcg) + 48 ml SF 0,9% = 50 ml (4 mcg/ml). Velocidade = Dose × Peso ÷ 4 = ml/h',
   },
 
@@ -422,140 +425,102 @@ export const drugs = [
       'Usar preferencialmente após sedação eficaz',
       'Pode ser revertido com sugamadex (2 mg/kg), se necessário',
     ],
-    alerts: ['NUNCA ADMINISTRAR SEM SEDAÇÃO E ANALGESIA ASSOCIADAS', 'Não possui ação sedativa nem analgésica'],
-    diluent: 'SF 0,9%',
-    calcType: 'rocuronio',
-    // Dose × Peso × 1,44 = mg → ÷ 10 = ml
-    concentration_mg_per_ml: 10,
+    alerts: ['mandatory_sedation', 'no_sedative_effect'],
+    algorithm: 'VASOACTIVE_STANDARD',
+    concentration: { value: 10, unit: 'mg/ml' },
+    preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
+    references: ['guide2026'],
     calcNote: 'Dose × Peso × 1,44 = mg → ÷ 10 (mg/ml) = ml do fármaco',
   },
 ];
 
 // ─── FÓRMULAS DE CÁLCULO ──────────────────────────────────────────────────────
+function round(value, decimals) {
+  const factor = Math.pow(10, decimals);
+  return Math.round(value * factor) / factor;
+}
+
 export function calculateDrug(drug, weightKg, dose, totalVolumeMl = 24) {
+  const volDecimals = SETTINGS.rounding.volume_ml;
+  const rateDecimals = SETTINGS.rounding.rate_ml_h;
+  const diluentName = drug.preparation.diluent;
+
   let drugVolumeMl = 0;
   let infusionRateMlH = 0;
   let equivalenceStr = '';
   let diluentVolumeMl = 0;
 
-  switch (drug.calcType) {
-    case 'standard_1_44': {
-      // Adrenalina, Noradrenalina, Milrinona
-      // volume_farmaco = dose × peso × 1,44   [ml direto, pois conc = 1 mg/ml e dose em mcg]
-      drugVolumeMl = dose * weightKg * 1.44;
+  switch (drug.algorithm) {
+    case 'VASOACTIVE_STANDARD': {
+      // volume_farmaco = (dose × peso × 1,44) ÷ concentração
+      drugVolumeMl = (dose * weightKg * 1.44) / drug.concentration.value;
       infusionRateMlH = totalVolumeMl / 24;
-      equivalenceStr = `${infusionRateMlH.toFixed(1)} ml/h = ${dose} ${drug.doseUnit}`;
+      equivalenceStr = `${round(infusionRateMlH, rateDecimals)} ml/h = ${dose} ${drug.doseUnit}`;
       break;
     }
-    case 'mg_divided': {
-      // Dopamina (÷5), Dobutamina (÷12.5), Nitroprussiato (÷25)
-      const mgTotal = dose * weightKg * 1.44; // mcg × kg × 1.44 = mg (pois 1440 min/24h ÷ 1000)
-      // Na verdade: dose(mcg/kg/min) × peso × 1440min/24h = total mcg/24h
-      // Para obter mg: ÷1000
-      // Mas o guia usa a fórmula direta sem divisão por 1000 porque a dose está em mcg
-      // e o resultado é em mg: dose(mcg/kg/min) × peso × 1440/1000 ≈ × 1.44
-      drugVolumeMl = mgTotal / drug.concentration_mg_per_ml;
+    case 'SEDATION_STANDARD': {
+      // volume_farmaco = (dose × peso × 24) ÷ concentração
+      drugVolumeMl = (dose * weightKg * 24) / drug.concentration.value;
       infusionRateMlH = totalVolumeMl / 24;
-      equivalenceStr = `${infusionRateMlH.toFixed(1)} ml/h = ${dose} ${drug.doseUnit}`;
+      equivalenceStr = `${round(infusionRateMlH, rateDecimals)} ml/h = ${dose} ${drug.doseUnit}`;
       break;
     }
-    case 'vasopressina': {
-      // Dose × Peso × 24 = UI totais → ÷ 0.4 = volume para 24h
-      // Solução: 1ml (20UI) + 49ml SF = 50ml (0,4 UI/ml)
+    case 'VASOPRESSIN': {
+      // Diluição padrão: 1ml (20UI) + 49ml SF = 50ml → concentração 0,4 UI/ml
       const totalUI = dose * weightKg * 24;
-      const totalVolForDrug = totalUI / 0.4; // volume em ml para 24h
+      const totalVolForDrug = totalUI / 0.4;
       infusionRateMlH = totalVolForDrug / 24;
-      // Prescrição sempre fixa: 1ml vasopressina + 49ml SF = 50ml
-      drugVolumeMl = 1; // 1ml = 20UI
-      diluentVolumeMl = 49;
-      equivalenceStr = `${infusionRateMlH.toFixed(2)} ml/h = ${dose} UI/kg/h`;
+      equivalenceStr = `${round(infusionRateMlH, rateDecimals)} ml/h = ${dose} UI/kg/h`;
       return {
-        drugVolumeMl: Math.round(drugVolumeMl * 10) / 10,
+        drugVolumeMl: 1,
         diluentVolumeMl: 49,
         totalVolumeMl: 50,
-        infusionRateMlH: Math.round(infusionRateMlH * 100) / 100,
+        infusionRateMlH: round(infusionRateMlH, rateDecimals),
         equivalenceStr,
         prescriptionLines: [
-          `Vasopressina --------- 1 ml (20 UI)`,
-          `SF 0,9% --------------- 49 ml`,
-          `Infundir ${infusionRateMlH.toFixed(2)} ml/h, EV, em bomba de infusão contínua (BIC)`,
-          `Nesta solução: ${infusionRateMlH.toFixed(2)} ml/h = ${dose} UI/kg/h`,
+          `${drug.name} --------- 1 ml (20 UI)`,
+          `${diluentName} --------------- 49 ml`,
+          `Infundir ${round(infusionRateMlH, rateDecimals)} ml/h, EV, em bomba de infusão contínua (BIC)`,
+          `Nesta solução: ${round(infusionRateMlH, rateDecimals)} ml/h = ${dose} UI/kg/h`,
         ],
       };
     }
-    case 'fentanil': {
-      // Dose × Peso × 24 = mcg totais → ÷ 50 (mcg/ml) = ml
-      const totalMcg = dose * weightKg * 24;
-      drugVolumeMl = totalMcg / drug.concentration_mcg_per_ml;
-      infusionRateMlH = totalVolumeMl / 24;
-      equivalenceStr = `${infusionRateMlH.toFixed(1)} ml/h = ${dose} ${drug.doseUnit}`;
-      break;
-    }
-    case 'midazolam': {
-      // Dose × Peso × 24 = mg → ÷ 5 = ml
-      const mgTotalMid = dose * weightKg * 24;
-      drugVolumeMl = mgTotalMid / drug.concentration_mg_per_ml;
-      infusionRateMlH = totalVolumeMl / 24;
-      equivalenceStr = `${infusionRateMlH.toFixed(1)} ml/h = ${dose} ${drug.doseUnit}`;
-      break;
-    }
-    case 'cetamina': {
-      // Dose × Peso × 1,44 = mg → ÷ 50 = ml
-      const mgTotalCet = dose * weightKg * 1.44;
-      drugVolumeMl = mgTotalCet / drug.concentration_mg_per_ml;
-      infusionRateMlH = totalVolumeMl / 24;
-      equivalenceStr = `${infusionRateMlH.toFixed(1)} ml/h = ${dose} ${drug.doseUnit}`;
-      break;
-    }
-    case 'dexmedetomidina': {
+    case 'DEXMEDETOMIDINE': {
       // Solução padrão fixa: 2ml fármaco + 48ml SF = 50ml (4 mcg/ml)
-      // Velocidade: Dose × Peso ÷ 4 = ml/h
       infusionRateMlH = (dose * weightKg) / 4;
-      drugVolumeMl = 2;
-      diluentVolumeMl = 48;
-      equivalenceStr = `${infusionRateMlH.toFixed(2)} ml/h = ${dose} ${drug.doseUnit}`;
       return {
         drugVolumeMl: 2,
         diluentVolumeMl: 48,
         totalVolumeMl: 50,
-        infusionRateMlH: Math.round(infusionRateMlH * 100) / 100,
-        equivalenceStr,
+        infusionRateMlH: round(infusionRateMlH, rateDecimals),
+        equivalenceStr: `${round(infusionRateMlH, rateDecimals)} ml/h = ${dose} ${drug.doseUnit}`,
         prescriptionLines: [
-          `Dexmedetomidina ---- 2 ml (200 mcg)`,
-          `SF 0,9% ------------ 48 ml`,
-          `Infundir ${infusionRateMlH.toFixed(2)} ml/h, EV, em bomba de infusão contínua (BIC)`,
-          `Nesta solução: ${infusionRateMlH.toFixed(2)} ml/h = ${dose} mcg/kg/h`,
+          `${drug.name} ---- 2 ml (200 mcg)`,
+          `${diluentName} ------------ 48 ml`,
+          `Infundir ${round(infusionRateMlH, rateDecimals)} ml/h, EV, em bomba de infusão contínua (BIC)`,
+          `Nesta solução: ${round(infusionRateMlH, rateDecimals)} ml/h = ${dose} mcg/kg/h`,
         ],
       };
-    }
-    case 'rocuronio': {
-      // Dose × Peso × 1,44 = mg → ÷ 10 = ml
-      const mgTotalRoc = dose * weightKg * 1.44;
-      drugVolumeMl = mgTotalRoc / drug.concentration_mg_per_ml;
-      infusionRateMlH = totalVolumeMl / 24;
-      equivalenceStr = `${infusionRateMlH.toFixed(1)} ml/h = ${dose} ${drug.doseUnit}`;
-      break;
     }
     default:
       break;
   }
 
-  // Arredondar volume do fármaco para 1 casa decimal
-  const drugVolumeRounded = Math.round(drugVolumeMl * 10) / 10;
+  const drugVolumeRounded = round(drugVolumeMl, volDecimals);
   diluentVolumeMl = totalVolumeMl - drugVolumeRounded;
 
   const prescriptionLines = [
     `${drug.name} ----------- ${drugVolumeRounded} ml`,
-    `${drug.diluent} ---------- ${diluentVolumeMl.toFixed(1)} ml`,
-    `Infundir ${infusionRateMlH.toFixed(1)} ml/h, EV, em bomba de infusão contínua (BIC)`,
+    `${diluentName} ---------- ${diluentVolumeMl.toFixed(volDecimals)} ml`,
+    `Infundir ${infusionRateMlH.toFixed(rateDecimals)} ml/h, EV, em bomba de infusão contínua (BIC)`,
     `Nesta solução: ${equivalenceStr}`,
   ];
 
   return {
     drugVolumeMl: drugVolumeRounded,
-    diluentVolumeMl: Math.round(diluentVolumeMl * 10) / 10,
+    diluentVolumeMl: round(diluentVolumeMl, volDecimals),
     totalVolumeMl,
-    infusionRateMlH: Math.round(infusionRateMlH * 10) / 10,
+    infusionRateMlH: round(infusionRateMlH, rateDecimals),
     equivalenceStr,
     prescriptionLines,
   };

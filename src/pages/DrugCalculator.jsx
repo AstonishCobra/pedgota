@@ -3,6 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { calculateDrug, DRUG_CATEGORIES } from '@/data/drugs';
 import { getDrugs } from '@/lib/drugStore';
 const drugs = getDrugs();
+import { getAlert } from '@/data/alerts';
+import { getReferenceTitle } from '@/data/references';
 import { Copy, Check, ChevronLeft, AlertTriangle, Info, Zap } from 'lucide-react';
 
 const VOLUME_OPTIONS = [
@@ -26,7 +28,15 @@ const categoryColor = {
     border: 'border-indigo-500/30',
     text: 'text-indigo-400',
     badge: 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30',
-    label: 'Sedativo/Analgésico',
+    label: 'Sedação',
+  },
+  [DRUG_CATEGORIES.ANALGESIA]: {
+    accent: 'text-violet-400',
+    bg: 'bg-violet-500/10',
+    border: 'border-violet-500/30',
+    text: 'text-violet-400',
+    badge: 'bg-violet-500/20 text-violet-300 border border-violet-500/30',
+    label: 'Analgesia',
   },
   [DRUG_CATEGORIES.BNM]: {
     accent: 'hsl(var(--destructive))',
@@ -124,8 +134,8 @@ export default function DrugCalculator() {
               <AlertTriangle size={16} className="text-red-400 flex-shrink-0" />
               <span className="text-red-400 font-semibold text-sm uppercase tracking-wide">Atenção</span>
             </div>
-            {drug.alerts.map((a, i) => (
-              <p key={i} className="text-red-300 text-sm leading-snug">{a}</p>
+            {drug.alerts.map((id) => (
+              <p key={id} className="text-red-300 text-sm leading-snug">{getAlert(id).description}</p>
             ))}
           </div>
         )}
@@ -192,7 +202,7 @@ export default function DrugCalculator() {
               )}
 
               {/* Volume total */}
-              {drug.calcType !== 'vasopressina' && drug.calcType !== 'dexmedetomidina' && (
+              {drug.algorithm !== 'VASOPRESSIN' && drug.algorithm !== 'DEXMEDETOMIDINE' && (
                 <div className="space-y-2">
                   <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
                     Volume total de preparo
@@ -365,6 +375,11 @@ export default function DrugCalculator() {
                 ))}
               </ul>
             </InfoSection>
+            {drug.references?.length > 0 && (
+              <p className="text-xs text-slate-600 px-1">
+                Fonte: {drug.references.map((id) => getReferenceTitle(id)).join(', ')}
+              </p>
+            )}
           </div>
         )}
       </div>

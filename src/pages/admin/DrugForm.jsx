@@ -1,22 +1,13 @@
 import React, { useState } from 'react';
 import { X, Plus, Trash2 } from 'lucide-react';
-import { DRUG_CATEGORIES } from '@/data/drugs';
-
-const CALC_TYPES = [
-  'standard_1_44',
-  'mg_divided',
-  'fentanil',
-  'midazolam',
-  'cetamina',
-  'dexmedetomidina',
-  'vasopressina',
-  'rocuronio',
-];
+import { CATEGORIES } from '@/data/categories';
+import { ALGORITHMS } from '@/data/algorithms';
+import { ALERTS } from '@/data/alerts';
 
 const EMPTY = {
   id: '',
   name: '',
-  category: DRUG_CATEGORIES.VASOACTIVE,
+  category: CATEGORIES[0].id,
   presentation: '',
   therapeuticClass: '',
   mechanism: '',
@@ -30,10 +21,10 @@ const EMPTY = {
   adverseEffects: [''],
   specialConsiderations: [''],
   alerts: [],
-  diluent: 'SF 0,9%',
-  calcType: 'standard_1_44',
-  concentration_mg_per_ml: 1,
-  doseUnitIsMilligram: false,
+  algorithm: 'VASOACTIVE_STANDARD',
+  concentration: { value: 1, unit: 'mg/ml' },
+  preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
+  references: ['guide2026'],
   calcNote: '',
 };
 
@@ -196,11 +187,7 @@ export default function DrugForm({ initial, onSave, onCancel }) {
                 <Select
                   value={form.category}
                   onChange={(v) => set('category', v)}
-                  options={[
-                    { value: DRUG_CATEGORIES.VASOACTIVE, label: 'Vasoativa' },
-                    { value: DRUG_CATEGORIES.SEDATIVE, label: 'Sedativo/Analgésico' },
-                    { value: DRUG_CATEGORIES.BNM, label: 'Bloqueador Neuromuscular' },
-                  ]}
+                  options={CATEGORIES.map((c) => ({ value: c.id, label: c.label }))}
                 />
               </Field>
             </div>
@@ -253,20 +240,23 @@ export default function DrugForm({ initial, onSave, onCancel }) {
             <div className="border border-slate-700 p-4 space-y-4">
               <p className="text-xs font-bold text-indigo-400 uppercase tracking-wider">Fórmula de Cálculo</p>
               <div className="grid grid-cols-2 gap-4">
-                <Field label="Tipo de Cálculo">
+                <Field label="Algoritmo">
                   <Select
-                    value={form.calcType}
-                    onChange={(v) => set('calcType', v)}
-                    options={CALC_TYPES.map((t) => ({ value: t, label: t }))}
+                    value={form.algorithm}
+                    onChange={(v) => set('algorithm', v)}
+                    options={Object.keys(ALGORITHMS).map((id) => ({ value: id, label: id }))}
                   />
                 </Field>
-                <Field label="Concentração (mg/ml)">
-                  <Input type="number" value={form.concentration_mg_per_ml ?? ''} onChange={(v) => set('concentration_mg_per_ml', v)} step={0.01} placeholder="mg/ml" />
+                <Field label="Concentração">
+                  <Input type="number" value={form.concentration?.value ?? ''} onChange={(v) => set('concentration', { ...form.concentration, value: v })} step={0.01} placeholder="valor" />
                 </Field>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <Field label="Diluente">
-                  <Input value={form.diluent} onChange={(v) => set('diluent', v)} placeholder="SF 0,9%" />
+                  <Input value={form.preparation?.diluent ?? ''} onChange={(v) => set('preparation', { ...form.preparation, diluent: v })} placeholder="SF 0,9%" />
+                </Field>
+                <Field label="Volume Final (ml)">
+                  <Input type="number" value={form.preparation?.finalVolume ?? ''} onChange={(v) => set('preparation', { ...form.preparation, finalVolume: v })} step={1} />
                 </Field>
               </div>
               <Field label="Nota de Cálculo">
@@ -278,7 +268,25 @@ export default function DrugForm({ initial, onSave, onCancel }) {
             <ListEditor label="Indicações" items={form.indications} onChange={(v) => set('indications', v)} placeholder="Indicação clínica..." />
             <ListEditor label="Efeitos Adversos" items={form.adverseEffects} onChange={(v) => set('adverseEffects', v)} placeholder="Efeito adverso..." />
             <ListEditor label="Considerações Especiais" items={form.specialConsiderations} onChange={(v) => set('specialConsiderations', v)} placeholder="Consideração..." />
-            <ListEditor label="Alertas Críticos" items={form.alerts} onChange={(v) => set('alerts', v)} placeholder="⚠ Alerta importante..." />
+            <Field label="Alertas Críticos">
+              <div className="space-y-1.5">
+                {Object.values(ALERTS).map((alert) => (
+                  <label key={alert.id} className="flex items-center gap-2 text-sm text-slate-300">
+                    <input
+                      type="checkbox"
+                      checked={form.alerts.includes(alert.id)}
+                      onChange={(e) => {
+                        const next = e.target.checked
+                          ? [...form.alerts, alert.id]
+                          : form.alerts.filter((a) => a !== alert.id);
+                        set('alerts', next);
+                      }}
+                    />
+                    {alert.title}
+                  </label>
+                ))}
+              </div>
+            </Field>
           </div>
 
           {/* Footer */}

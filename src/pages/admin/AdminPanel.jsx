@@ -15,7 +15,8 @@ import BackupsPanel from './BackupsPanel';
 
 const CATEGORY_LABELS = {
   [DRUG_CATEGORIES.VASOACTIVE]: { label: 'Vasoativa', color: 'text-amber-400 bg-amber-500/10 border-amber-500/30' },
-  [DRUG_CATEGORIES.SEDATIVE]: { label: 'Sedativo/Analgésico', color: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/30' },
+  [DRUG_CATEGORIES.SEDATIVE]: { label: 'Sedação', color: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/30' },
+  [DRUG_CATEGORIES.ANALGESIA]: { label: 'Analgesia', color: 'text-violet-400 bg-violet-500/10 border-violet-500/30' },
   [DRUG_CATEGORIES.BNM]: { label: 'BNM', color: 'text-red-400 bg-red-500/10 border-red-500/30' },
 };
 
