@@ -440,6 +440,15 @@ function round(value, decimals) {
   return Math.round(value * factor) / factor;
 }
 
+const DILUENT_FULL_NAMES = {
+  'SF 0,9%': 'Soro Fisiológico 0,9%',
+  'SG 5%': 'Soro Glicosado 5%',
+};
+
+function diluentFullName(diluentName) {
+  return DILUENT_FULL_NAMES[diluentName] || diluentName;
+}
+
 export function calculateDrug(drug, weightKg, dose, totalVolumeMl = 24) {
   const volDecimals = SETTINGS.rounding.volume_ml;
   const rateDecimals = SETTINGS.rounding.rate_ml_h;
@@ -478,8 +487,8 @@ export function calculateDrug(drug, weightKg, dose, totalVolumeMl = 24) {
         infusionRateMlH: round(infusionRateMlH, rateDecimals),
         equivalenceStr,
         prescriptionLines: [
-          `${drug.name} --------- 1 ml (20 UI)`,
-          `${diluentName} --------------- 49 ml`,
+          `${drug.name} (${drug.presentation}) --------- 1 ml (20 UI)`,
+          `${diluentFullName(diluentName)} --------------- 49 ml`,
           `Infundir ${round(infusionRateMlH, rateDecimals)} ml/h, EV, em bomba de infusão contínua (BIC)`,
           `Nesta solução: ${round(infusionRateMlH, rateDecimals)} ml/h = ${dose} UI/kg/h`,
         ],
@@ -495,8 +504,8 @@ export function calculateDrug(drug, weightKg, dose, totalVolumeMl = 24) {
         infusionRateMlH: round(infusionRateMlH, rateDecimals),
         equivalenceStr: `${round(infusionRateMlH, rateDecimals)} ml/h = ${dose} ${drug.doseUnit}`,
         prescriptionLines: [
-          `${drug.name} ---- 2 ml (200 mcg)`,
-          `${diluentName} ------------ 48 ml`,
+          `${drug.name} (${drug.presentation}) ---- 2 ml (200 mcg)`,
+          `${diluentFullName(diluentName)} ------------ 48 ml`,
           `Infundir ${round(infusionRateMlH, rateDecimals)} ml/h, EV, em bomba de infusão contínua (BIC)`,
           `Nesta solução: ${round(infusionRateMlH, rateDecimals)} ml/h = ${dose} mcg/kg/h`,
         ],
@@ -510,8 +519,8 @@ export function calculateDrug(drug, weightKg, dose, totalVolumeMl = 24) {
   diluentVolumeMl = totalVolumeMl - drugVolumeRounded;
 
   const prescriptionLines = [
-    `${drug.name} ----------- ${drugVolumeRounded} ml`,
-    `${diluentName} ---------- ${diluentVolumeMl.toFixed(volDecimals)} ml`,
+    `${drug.name} (${drug.presentation}) ----------- ${drugVolumeRounded} ml`,
+    `${diluentFullName(diluentName)} ---------- ${diluentVolumeMl.toFixed(volDecimals)} ml`,
     `Infundir ${infusionRateMlH.toFixed(rateDecimals)} ml/h, EV, em bomba de infusão contínua (BIC)`,
     `Nesta solução: ${equivalenceStr}`,
   ];
