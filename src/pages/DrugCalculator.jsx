@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { calculateDrug, DRUG_CATEGORIES } from '@/data/drugs';
 import { getDrugs } from '@/lib/drugStore';
 const drugs = getDrugs();
-import { getAlert } from '@/data/alerts';
+import { ALERT_MESSAGES } from '@/utils/alertMessages';
 import { getReferenceTitle } from '@/data/references';
 import { Copy, Check, ChevronLeft, AlertTriangle, Info, Zap } from 'lucide-react';
 
@@ -140,8 +140,10 @@ export default function DrugCalculator() {
               <AlertTriangle size={16} className="text-red-400 flex-shrink-0" />
               <span className="text-red-400 font-semibold text-sm uppercase tracking-wide">Atenção</span>
             </div>
-            {drug.alerts.map((id) => (
-              <p key={id} className="text-red-300 text-sm leading-snug">{getAlert(id).description}</p>
+            {drug.alerts.map((code) => (
+              <p key={code} className="text-red-300 text-sm leading-snug">
+                {ALERT_MESSAGES[code]?.message || code}
+              </p>
             ))}
           </div>
         )}
