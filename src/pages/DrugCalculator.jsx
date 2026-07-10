@@ -4,6 +4,7 @@ import { calculateDrug, DRUG_CATEGORIES } from '@/data/drugs';
 import { getDrugs } from '@/lib/drugStore';
 const drugs = getDrugs();
 import { ALERT_MESSAGES } from '@/utils/alertMessages';
+import { calculateStandardProtocol } from '@/utils/standardProtocolCalcEngine';
 import { getReferenceTitle } from '@/data/references';
 import { Copy, Check, ChevronLeft, AlertTriangle, Info, Zap } from 'lucide-react';
 
@@ -58,6 +59,7 @@ export default function DrugCalculator() {
   const [totalVolume, setTotalVolume] = useState(24);
   const [activeTab, setActiveTab] = useState('calc');
   const [copied, setCopied] = useState(false);
+  const [protocolMode, setProtocolMode] = useState('guia');
 
   const result = useMemo(() => {
     const w = parseFloat(weight);
@@ -65,6 +67,17 @@ export default function DrugCalculator() {
     if (!drug || !w || !d || w <= 0 || d <= 0) return null;
     return calculateDrug(drug, w, d, totalVolume);
   }, [drug, weight, dose, totalVolume]);
+
+  const standardResult = useMemo(() => {
+    const w = parseFloat(weight);
+    const d = parseFloat(dose);
+    if (!drug || !w || !d || w <= 0 || d <= 0) return null;
+    try {
+      return calculateStandardProtocol({ ...drug, standardProtocol: drug.neofaxProtocol }, d, w);
+    } catch (e) {
+      return { available: false, reason: e.message };
+    }
+  }, [drug, weight, dose]);
 
   const doseValue = parseFloat(dose);
   const isDoseOutOfRange = drug && !isNaN(doseValue) && (doseValue < drug.doseMin || doseValue > drug.doseMax);
@@ -142,6 +155,35 @@ export default function DrugCalculator() {
           <>
             {/* Inputs */}
             <div className={`rounded-xl border ${colors.border} ${colors.bg} p-5 space-y-5`}>
+              {/* Seletor de protocolo */}
+              <div className="space-y-2">
+                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                  Protocolo de cálculo
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => setProtocolMode('guia')}
+                    className={`rounded-lg py-2 text-sm font-semibold border transition-all ${
+                      protocolMode === 'guia'
+                        ? `${colors.bg} ${colors.border} ${colors.text}`
+                        : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-500'
+                    }`}
+                  >
+                    Guia
+                  </button>
+                  <button
+                    onClick={() => setProtocolMode('standard')}
+                    className={`rounded-lg py-2 text-sm font-semibold border transition-all ${
+                      protocolMode === 'standard'
+                        ? `${colors.bg} ${colors.border} ${colors.text}`
+                        : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-500'
+                    }`}
+                  >
+                    Protocolo Padrão
+                  </button>
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 {/* Peso */}
                 <div className="space-y-2">
@@ -220,7 +262,7 @@ export default function DrugCalculator() {
               )}
 
               {/* Volume total */}
-              {drug.algorithm !== 'VASOPRESSIN' && drug.algorithm !== 'DEXMEDETOMIDINE' && (
+              {protocolMode === 'guia' && drug.algorithm !== 'VASOPRESSIN' && drug.algorithm !== 'DEXMEDETOMIDINE' && (
                 <div className="space-y-2">
                   <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
                     Volume total de preparo
@@ -246,7 +288,52 @@ export default function DrugCalculator() {
             </div>
 
             {/* Resultado */}
-            {result ? (
+            {protocolMode === 'standard' ? (
+              standardResult ? (
+                standardResult.available ? (
+                  <div className="rounded-xl border border-slate-700 bg-slate-800/50 overflow-hidden">
+                    <div className="p-5 text-center border-b border-slate-700">
+                      <div className="text-3xl font-bold text-slate-100">{standardResult.rateMlPerHour}</div>
+                      <div className="text-xs text-slate-500 mt-1">mL/h — bomba de infusão contínua</div>
+                    </div>
+                    <div className="p-4 space-y-3">
+                      {!standardResult.doseValidation.inRange && (
+                        <div className="flex items-start gap-2 rounded-lg border border-orange-500/40 bg-orange-500/10 p-3">
+                          <AlertTriangle size={15} className="text-orange-400 flex-shrink-0 mt-0.5" />
+                          <p className="text-orange-300 text-sm leading-snug">{standardResult.doseValidation.message}</p>
+                        </div>
+                      )}
+                      <div className="text-xs space-y-1">
+                        <p className="text-slate-400">
+                          Concentração-padrão:{' '}
+                          <span className={`font-semibold ${colors.text}`}>
+                            {standardResult.concentrationUsed.value} {standardResult.concentrationUsed.unit}
+                          </span>
+                        </p>
+                        <p className="text-slate-600 font-mono break-all">{standardResult.formulaUsed}</p>
+                      </div>
+                      {standardResult.source && (
+                        <p className="text-[11px] text-slate-600 leading-snug">Fonte: {standardResult.source}</p>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="rounded-xl border border-slate-700 bg-slate-800/30 p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Info size={15} className="text-slate-400 flex-shrink-0" />
+                      <span className="text-slate-400 font-semibold text-sm uppercase tracking-wide">
+                        Protocolo Padrão indisponível
+                      </span>
+                    </div>
+                    <p className="text-sm text-slate-400 leading-snug">{standardResult.reason}</p>
+                  </div>
+                )
+              ) : (
+                <div className="rounded-xl border border-slate-800 bg-slate-800/30 p-8 text-center">
+                  <p className="text-slate-500 text-sm">Informe o peso e a dose para calcular</p>
+                </div>
+              )
+            ) : result ? (
               <>
               {/* Aviso de volume insuficiente */}
               {result.diluentVolumeMl < 0 && (() => {
