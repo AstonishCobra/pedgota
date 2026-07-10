@@ -72,6 +72,11 @@ export default function DrugCalculator() {
   const weightValue = parseFloat(weight);
   const isWeightUnusual = !isNaN(weightValue) && weightValue > 50;
 
+  const criticalAlerts = (drug?.alerts || []).filter((code) => {
+    const sev = ALERT_MESSAGES[code]?.severity;
+    return sev === 'black_box' || sev === 'critical';
+  });
+
   const handleCopy = useCallback(() => {
     if (!result) return;
     const text = result.prescriptionLines.join('\n');
@@ -133,21 +138,6 @@ export default function DrugCalculator() {
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
-        {/* Alertas críticos */}
-        {drug.alerts.length > 0 && (
-          <div className="rounded-xl border border-red-500/40 bg-red-500/10 p-4 space-y-1">
-            <div className="flex items-center gap-2 mb-2">
-              <AlertTriangle size={16} className="text-red-400 flex-shrink-0" />
-              <span className="text-red-400 font-semibold text-sm uppercase tracking-wide">Atenção</span>
-            </div>
-            {drug.alerts.map((code) => (
-              <p key={code} className="text-red-300 text-sm leading-snug">
-                {ALERT_MESSAGES[code]?.message || code}
-              </p>
-            ))}
-          </div>
-        )}
-
         {activeTab === 'calc' && (
           <>
             {/* Inputs */}
@@ -349,6 +339,21 @@ export default function DrugCalculator() {
               <Info size={12} className="flex-shrink-0 mt-0.5" />
               <span>{drug.calcNote}</span>
             </div>
+
+            {/* Alertas críticos (tarja preta / risco de vida) */}
+            {criticalAlerts.length > 0 && (
+              <div className="rounded-xl border border-red-500/40 bg-red-500/10 p-4 space-y-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <AlertTriangle size={16} className="text-red-400 flex-shrink-0" />
+                  <span className="text-red-400 font-semibold text-sm uppercase tracking-wide">Atenção</span>
+                </div>
+                {criticalAlerts.map((code) => (
+                  <p key={code} className="text-red-300 text-sm leading-snug">
+                    {ALERT_MESSAGES[code]?.message || code}
+                  </p>
+                ))}
+              </div>
+            )}
           </>
         )}
 
