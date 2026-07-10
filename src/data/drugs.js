@@ -35,13 +35,12 @@ export const drugs = [
       'Em uso periférico: monitorar rigorosamente para evitar necrose',
       'Monitorar FC, PA, ECG e perfusão periférica continuamente',
     ],
-    alerts: [],
     algorithm: 'VASOACTIVE_STANDARD',
     concentration: { value: 1, unit: 'mg/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
     references: ['guide2026'],
     calcNote: 'Dose × Peso × 1,44 = ml do fármaco para 24h a 1 ml/h',
-    neofaxProtocol: {
+    standardProtocol: {
       "type": "standard_concentration",
       "standardConcentration": { "value": 10, "unit": "mcg/ml" },
       "doseMin": 0.1,
@@ -86,13 +85,12 @@ export const drugs = [
       'Monitorar extremidades para sinais de isquemia',
       'Garantir reposição volêmica adequada antes do início',
     ],
-    alerts: [],
     algorithm: 'VASOACTIVE_STANDARD',
     concentration: { value: 1, unit: 'mg/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
     references: ['guide2026'],
     calcNote: 'Dose × Peso × 1,44 = ml do fármaco para 24h a 1 ml/h',
-    neofaxProtocol: {
+    standardProtocol: {
       "type": "standard_concentration",
       "standardConcentration": { "value": 16, "unit": "mcg/ml" },
       "doseMin": 0.2,
@@ -142,13 +140,12 @@ export const drugs = [
       'Monitorizar frequência cardíaca e perfusão',
       'Evitar uso prolongado em altas doses (risco de isquemia)',
     ],
-    alerts: [],
     algorithm: 'VASOACTIVE_STANDARD',
     concentration: { value: 5, unit: 'mg/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
     references: ['guide2026'],
     calcNote: 'Dose × Peso × 1,44 = mg → ÷ 5 (mg/ml) = ml do fármaco',
-    neofaxProtocol: {
+    standardProtocol: {
       "type": "standard_concentration",
       "standardConcentration": { "value": 1600, "unit": "mcg/ml" },
       "doseMin": 2,
@@ -195,13 +192,12 @@ export const drugs = [
       'Monitorar FC, PA e sinais de perfusão',
       'Pode ser usada em acesso periférico de curto prazo; preferir acesso central',
     ],
-    alerts: [],
     algorithm: 'VASOACTIVE_STANDARD',
     concentration: { value: 12.5, unit: 'mg/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
     references: ['guide2026'],
     calcNote: 'Dose × Peso × 1,44 = mg → ÷ 12,5 (mg/ml) = ml do fármaco',
-    neofaxProtocol: {
+    standardProtocol: {
       "type": "standard_concentration",
       "standardConcentration": { "value": 2000, "unit": "mcg/ml" },
       "doseMin": 2,
@@ -248,7 +244,6 @@ export const drugs = [
       'Desmame gradual para evitar hipotensão rebote',
       'Associar à noradrenalina na maioria dos casos; não substitui o vasopressor principal',
     ],
-    alerts: [],
     algorithm: 'VASOPRESSIN',
     concentration: { value: 20, unit: 'UI/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 50 },
@@ -261,7 +256,7 @@ export const drugs = [
         "indication": "Choque vasodilatório/séptico refratário a volume e catecolaminas exógenas (pediatria geral)",
         "doseMin": 0.01,
         "doseMax": 0.48,
-        "notes": "Faixa de uso relatado retrospectivamente: 0,17-8 milliunits/kg/minute = 0,01-0,48 UI/kg/h (Brierley 2009, Choong 2008, Meyer 2008 - dosing baseado em revisões retrospectivas e relatos de caso). ALERTA DE SEGURANÇA: o único ensaio duplo-cego, randomizado, placebo-controlado (Choong 2009, n=65, 3-14 anos) testou uma faixa mais estreita - 0,5-2 milliunits/kg/minute = 0,03-0,12 UI/kg/h - e não encontrou diferença significativa no tempo até estabilidade hemodinâmica, com tendência a MAIOR mortalidade no grupo vasopressina; os autores não recomendaram uso rotineiro. DECISÃO: não foi construído motor de cálculo 'neofax' com concentração-padrão fixa para esta droga - monografia própria do NeoFax/Micromedex não foi localizada nesta consulta (documento de referência disponível foi Lexicomp Pediatric), e o próprio Lexicomp não define concentração única recomendada (apenas faixa de diluição 0,1-1 unit/mL). Demais indicações pediátricas do Lexicomp, não incorporadas ao motor de cálculo (apenas contexto): hemorragia GI 2-10 milliunits/kg/min (0,12-0,6 UI/kg/h); PCR/FV/TV refratária 0,4 UI/kg dose única (bolus, não infusão contínua); cirurgia cardíaca neonatal 0,3-0,5 milliunits/kg/min (0,018-0,03 UI/kg/h); PPHN refratária neonatal 0,1-1,2 milliunits/kg/min (0,006-0,072 UI/kg/h).",
+        "notes": "Faixa de uso relatado retrospectivamente: 0,17-8 milliunits/kg/minute = 0,01-0,48 UI/kg/h (Brierley 2009, Choong 2008, Meyer 2008 - dosing baseado em revisões retrospectivas e relatos de caso). ALERTA DE SEGURANÇA: o único ensaio duplo-cego, randomizado, placebo-controlado (Choong 2009, n=65, 3-14 anos) testou uma faixa mais estreita - 0,5-2 milliunits/kg/minute = 0,03-0,12 UI/kg/h - e não encontrou diferença significativa no tempo até estabilidade hemodinâmica, com tendência a MAIOR mortalidade no grupo vasopressina; os autores não recomendaram uso rotineiro. DECISÃO: não foi construído motor de cálculo 'Protocolo Padrão' com concentração-padrão fixa para esta droga - monografia própria do NeoFax/Micromedex não foi localizada nesta consulta (documento de referência disponível foi Lexicomp Pediatric), e o próprio Lexicomp não define concentração única recomendada (apenas faixa de diluição 0,1-1 unit/mL). Demais indicações pediátricas do Lexicomp, não incorporadas ao motor de cálculo (apenas contexto): hemorragia GI 2-10 milliunits/kg/min (0,12-0,6 UI/kg/h); PCR/FV/TV refratária 0,4 UI/kg dose única (bolus, não infusão contínua); cirurgia cardíaca neonatal 0,3-0,5 milliunits/kg/min (0,018-0,03 UI/kg/h); PPHN refratária neonatal 0,1-1,2 milliunits/kg/min (0,006-0,072 UI/kg/h).",
         "preparationRange": { "value": "0,1-1", "unit": "UI/ml", "notes": "Lexicomp não recomenda concentração única fixa - diluir em NS ou D5W a uma concentração final entre 0,1 e 1 unit/mL." },
         "source": "Lexicomp Pediatric, 2021 - VASOPRESSIN Drug Monograph, Dosing (Vasodilatory shock with hypotension unresponsive to fluid resuscitation and exogenous catecholamines)"
       },
@@ -302,13 +297,12 @@ export const drugs = [
       'Uso exclusivo com bomba de infusão para controle preciso',
       'Monitorar pressão arterial de forma contínua',
     ],
-    alerts: [],
     algorithm: 'VASOACTIVE_STANDARD',
     concentration: { value: 1, unit: 'mg/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
     references: ['guide2026'],
     calcNote: 'Dose × Peso × 1,44 = ml do fármaco para 24h a 1 ml/h',
-    neofaxProtocol: {
+    standardProtocol: {
       "type": "standard_concentration",
       "standardConcentration": { "value": 200, "unit": "mcg/ml" },
       "doseMin": 0.25,
@@ -353,7 +347,6 @@ export const drugs = [
       'Evitar infusão >72h',
       'Cautela em insuficiência renal ou hepática (↑risco de toxicidade)',
     ],
-    alerts: ['photoprotection', 'cyanide_toxicity_risk'],
     algorithm: 'VASOACTIVE_STANDARD',
     concentration: { value: 25, unit: 'mg/ml' },
     preparation: { diluent: 'SG 5%', finalVolume: 24 },
@@ -366,7 +359,7 @@ export const drugs = [
         "doseInitial": "0,3-0,5 mcg/kg/min, titular a cada 5 minutos até efeito desejado",
         "doseUsual": "3-4 mcg/kg/min",
         "doseMax": 10,
-        "notes": "Faixa de dose (0,3-10 mcg/kg/min) confirmada de forma convergente pelo Guia PediDrip e pelo HSL - melhor convergência entre as três fontes até agora. Indicação adicional não incorporada ao motor de cálculo: manutenção de débito cardíaco pós-ressuscitação (PALS) - inicial 0,5-1 mcg/kg/min, titular a efeito, máximo 8 mcg/kg/min. DECISÃO: não foi construído motor de cálculo 'neofax' com concentração-padrão fixa - Lexicomp não recomenda valor único, apenas faixa de diluição (solução concentrada 25mg/mL diluída a 50-200 mcg/mL, preferencialmente em D5W; até 1000 mcg/mL descrito em pacientes com restrição de fluidos). Ajuste por função renal: eGFR<30 mL/min/1,73m² - limitar taxa de infusão média a <3 mcg/kg/min; pacientes anúricos - limitar a <1 mcg/kg/min (risco de acúmulo de tiocianato). Uso prolongado (>72h) - alguns especialistas recomendam monitorar níveis de cianeto/tiocianato.",
+        "notes": "Faixa de dose (0,3-10 mcg/kg/min) confirmada de forma convergente pelo Guia PediDrip e pelo HSL - melhor convergência entre as três fontes até agora. Indicação adicional não incorporada ao motor de cálculo: manutenção de débito cardíaco pós-ressuscitação (PALS) - inicial 0,5-1 mcg/kg/min, titular a efeito, máximo 8 mcg/kg/min. DECISÃO: não foi construído motor de cálculo 'Protocolo Padrão' com concentração-padrão fixa - Lexicomp não recomenda valor único, apenas faixa de diluição (solução concentrada 25mg/mL diluída a 50-200 mcg/mL, preferencialmente em D5W; até 1000 mcg/mL descrito em pacientes com restrição de fluidos). Ajuste por função renal: eGFR<30 mL/min/1,73m² - limitar taxa de infusão média a <3 mcg/kg/min; pacientes anúricos - limitar a <1 mcg/kg/min (risco de acúmulo de tiocianato). Uso prolongado (>72h) - alguns especialistas recomendam monitorar níveis de cianeto/tiocianato.",
         "source": "Lexicomp Pediatric, 2021 - Nitroprusside Drug Monograph, Dosing/Preparation for Administration"
       },
       {
@@ -407,13 +400,12 @@ export const drugs = [
       'Ajustar dose em insuficiência hepática',
       'Retirar gradualmente se uso prolongado (risco de abstinência)',
     ],
-    alerts: [],
     algorithm: 'SEDATION_STANDARD',
     concentration: { value: 50, unit: 'mcg/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
     references: ['guide2026'],
     calcNote: 'Dose × Peso × 24 = mcg totais → ÷ 50 (mcg/ml) = ml do fármaco',
-    neofaxProtocol: {
+    standardProtocol: {
       "type": "standard_concentration",
       "standardConcentration": { "value": 10, "unit": "mcg/ml" },
       "doseMin": 1,
@@ -461,13 +453,12 @@ export const drugs = [
       'Acúmulo em infusões prolongadas com disfunção hepática',
       'Fazer desmame gradual para evitar abstinência',
     ],
-    alerts: [],
     algorithm: 'SEDATION_STANDARD',
     concentration: { value: 5, unit: 'mg/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
     references: ['guide2026'],
     calcNote: 'Dose × Peso × 24 = mg → ÷ 5 (mg/ml) = ml do fármaco',
-    neofaxProtocol: {
+    standardProtocol: {
       "type": "standard_concentration",
       "standardConcentration": { "value": 0.5, "unit": "mg/ml" },
       "doseMin": 0.01,
@@ -514,18 +505,17 @@ export const drugs = [
       'Pode ser associada ao midazolam para reduzir efeitos psíquicos',
       'Monitorização rigorosa da via aérea e nível de sedação',
     ],
-    alerts: [],
     algorithm: 'VASOACTIVE_STANDARD',
     concentration: { value: 50, unit: 'mg/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
     references: ['guide2026'],
     calcNote: 'Dose × Peso × 1,44 = mg → ÷ 50 (mg/ml) = ml do fármaco',
-    neofaxProtocol: {
+    standardProtocol: {
       "type": "standard_concentration",
       "standardConcentration": { "value": 1, "unit": "mg/ml" },
       "doseMin": 5,
       "doseMax": 20,
-      "notes": "ATENÇÃO NA FONTE: não há monografia própria do NeoFax/Micromedex para cetamina (droga não localizada nessa base) - dados desta faixa são do LEXICOMP Pediatric (seção 'Sedação/analgesia, pacientes críticos'), mantido na chave 'neofax' apenas por consistência estrutural do schema, mas a fonte real está identificada no campo 'source' abaixo. CONVERGÊNCIA FORTE com HSL, tanto em dose quanto em concentração (padrão semelhante ao caso da milrinona): Lexicomp - dose inicial IV 0,5-2mg/kg, então infusão contínua 5-20 mcg/kg/minuto (0,3-1,2 mg/kg/hora), iniciar na dosagem mais baixa e titular a efeito; HSL - infusão contínua pediátrica 5-20mcg/kg/min (dose máxima declarada: 20). Concentração: Lexicomp - diluir frascos de 50/100mg/mL em D5W ou NS para concentração final de 1mg/mL; em pacientes com restrição de fluidos, 2mg/mL pode ser usada; HSL - preparo '10mL (500mg) para 500mL' = 1mg/mL, concentração máxima declarada 2mg/mL (idêntico ao Lexicomp). Por decisão do usuário, adotado 1mg/mL como concentração-padrão. ⚠️ DIVERGÊNCIA COM O GUIA: o teto atual do Guia PediDrip (60mcg/kg/min) é MUITO mais alto que a faixa padrão convergente (5-20) - esse valor de 60 aparece nas duas fontes apenas como dose EXTREMA e não-padrão, relatada em caso isolado de broncoespasmo refratário (Youssef Ahmed 1996, citado pelo Lexicomp) - não é a faixa usual de sedação/analgesia contínua. Guia não alterado, apenas registrada a divergência.",
+      "notes": "ATENÇÃO NA FONTE: não há monografia própria do NeoFax/Micromedex para cetamina (droga não localizada nessa base) - dados desta faixa são do LEXICOMP Pediatric (seção 'Sedação/analgesia, pacientes críticos'), mantido na chave 'standardProtocol' apenas por consistência estrutural do schema, mas a fonte real está identificada no campo 'source' abaixo. CONVERGÊNCIA FORTE com HSL, tanto em dose quanto em concentração (padrão semelhante ao caso da milrinona): Lexicomp - dose inicial IV 0,5-2mg/kg, então infusão contínua 5-20 mcg/kg/minuto (0,3-1,2 mg/kg/hora), iniciar na dosagem mais baixa e titular a efeito; HSL - infusão contínua pediátrica 5-20mcg/kg/min (dose máxima declarada: 20). Concentração: Lexicomp - diluir frascos de 50/100mg/mL em D5W ou NS para concentração final de 1mg/mL; em pacientes com restrição de fluidos, 2mg/mL pode ser usada; HSL - preparo '10mL (500mg) para 500mL' = 1mg/mL, concentração máxima declarada 2mg/mL (idêntico ao Lexicomp). Por decisão do usuário, adotado 1mg/mL como concentração-padrão. ⚠️ DIVERGÊNCIA COM O GUIA: o teto atual do Guia PediDrip (60mcg/kg/min) é MUITO mais alto que a faixa padrão convergente (5-20) - esse valor de 60 aparece nas duas fontes apenas como dose EXTREMA e não-padrão, relatada em caso isolado de broncoespasmo refratário (Youssef Ahmed 1996, citado pelo Lexicomp) - não é a faixa usual de sedação/analgesia contínua. Guia não alterado, apenas registrada a divergência.",
       "source": "Lexicomp Pediatric, 2021 - Ketamine Drug Monograph, Dosing (Sedation/analgesia, critically ill patients); confirmado por Guia Farmacêutico HSL - ESCETAMINA/CETAMINA, atualizado 17/01/2025, https://guiafarmaceutico.hsl.org.br/cetamina"
     },
     alerts: ['incompatible_with_barbiturates', 'potentiated_by_diazepam', 'neonatal_use_expert_caution', 'non_standard_extreme_dose_case_report_only'],
@@ -561,19 +551,18 @@ export const drugs = [
       'Evitar em bradicardia importante ou bloqueios AV grau 2 ou 3',
       'Boa opção para sedação leve a moderada em UTI pediátrica',
     ],
-    alerts: ['no_loading_dose'],
     algorithm: 'DEXMEDETOMIDINE',
     concentration: { value: 100, unit: 'mcg/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 50 },
     references: ['guide2026'],
     // Diluição padrão fixa: 2ml (200mcg) + 48ml SF = 50ml → 4 mcg/ml
     calcNote: 'Diluição padrão: 2 ml (200 mcg) + 48 ml SF 0,9% = 50 ml (4 mcg/ml). Velocidade = Dose × Peso ÷ 4 = ml/h',
-    neofaxProtocol: {
+    standardProtocol: {
       "type": "standard_concentration",
       "standardConcentration": { "value": 4, "unit": "mcg/ml" },
       "doseMin": 0.2,
       "doseMax": 0.5,
-      "notes": "ATENÇÃO NA FONTE: não há monografia própria do NeoFax/Micromedex para dexmedetomidina - droga não localizada nessa base. Dados desta faixa são do LEXICOMP Pediatric/Neonatal, mantidos na chave 'neofax' apenas por consistência estrutural do schema (fonte real identificada no campo 'source'). CONVERGÊNCIA PERFEITA de concentração entre Lexicomp e HSL - receita de diluição idêntica, palavra por palavra: diluir 200mcg (2mL) em 48mL SF 0,9% para concentração final de 4mcg/mL; HSL inclusive comercializa bolsa pronta ('Dex Bolsa') nessa exata concentração. Dose adotada (0,2-0,5 mcg/kg/h) é a dose INICIAL de manutenção para lactentes/crianças/adolescentes em sedação de UTI, idêntica em ambas as fontes (Lexicomp: 'Maintenance dose: Continuous IV infusion: Initial 0.2 to 0.5 mcg/kg/hour'; HSL: 'Dose de manutenção: inicialmente 0,2 a 0,5 mcg/kg/h'). NÃO incorporadas nesta versão: (a) faixa usual relatada mais ampla do Lexicomp após titulação (0,4-0,7 mcg/kg/h, dose máxima 2,5mcg/kg/h); (b) faixas específicas para neonatos - Lexicomp inicial 0,1-0,3 (faixa relatada 0,2-0,6, máx 2,5mcg/kg/h), HSL inicial 0,1-0,3 (máximo declarado 1,5mcg/kg/h); (c) indicações de sedação para procedimentos não-invasivos (ataque 0,5-2mcg/kg/dose, manutenção 0,5-1mcg/kg/h) e pré-anestésico intranasal (1-2mcg/kg dose única). Segurança e eficácia em pacientes pediátricos <18 anos não formalmente estabelecidas pelo fabricante - uso amplamente descrito na literatura (off-label), mas com dados limitados.",
+      "notes": "ATENÇÃO NA FONTE: não há monografia própria do NeoFax/Micromedex para dexmedetomidina - droga não localizada nessa base. Dados desta faixa são do LEXICOMP Pediatric/Neonatal, mantidos na chave 'standardProtocol' apenas por consistência estrutural do schema (fonte real identificada no campo 'source'). CONVERGÊNCIA PERFEITA de concentração entre Lexicomp e HSL - receita de diluição idêntica, palavra por palavra: diluir 200mcg (2mL) em 48mL SF 0,9% para concentração final de 4mcg/mL; HSL inclusive comercializa bolsa pronta ('Dex Bolsa') nessa exata concentração. Dose adotada (0,2-0,5 mcg/kg/h) é a dose INICIAL de manutenção para lactentes/crianças/adolescentes em sedação de UTI, idêntica em ambas as fontes (Lexicomp: 'Maintenance dose: Continuous IV infusion: Initial 0.2 to 0.5 mcg/kg/hour'; HSL: 'Dose de manutenção: inicialmente 0,2 a 0,5 mcg/kg/h'). NÃO incorporadas nesta versão: (a) faixa usual relatada mais ampla do Lexicomp após titulação (0,4-0,7 mcg/kg/h, dose máxima 2,5mcg/kg/h); (b) faixas específicas para neonatos - Lexicomp inicial 0,1-0,3 (faixa relatada 0,2-0,6, máx 2,5mcg/kg/h), HSL inicial 0,1-0,3 (máximo declarado 1,5mcg/kg/h); (c) indicações de sedação para procedimentos não-invasivos (ataque 0,5-2mcg/kg/dose, manutenção 0,5-1mcg/kg/h) e pré-anestésico intranasal (1-2mcg/kg dose única). Segurança e eficácia em pacientes pediátricos <18 anos não formalmente estabelecidas pelo fabricante - uso amplamente descrito na literatura (off-label), mas com dados limitados.",
       "source": "Lexicomp Pediatric/Neonatal, 2021 - Dexmedetomidine Drug Monograph, Dosing (ICU sedation); confirmado por Guia Farmacêutico HSL - DEXMEDETOMIDINA, atualizado 27/01/2026, https://guiafarmaceutico.hsl.org.br/dexmedetomidina"
     },
     alerts: ['no_loading_dose', 'bradycardia_hypotension_sinus_arrest', 'transient_hypertension_loading_dose', 'pediatric_safety_not_formally_established', 'tolerance_withdrawal_prolonged_use'],
@@ -604,13 +593,12 @@ export const drugs = [
       'Usar preferencialmente após sedação eficaz',
       'Pode ser revertido com sugamadex (2 mg/kg), se necessário',
     ],
-    alerts: ['mandatory_sedation', 'no_sedative_effect'],
     algorithm: 'VASOACTIVE_STANDARD',
     concentration: { value: 10, unit: 'mg/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
     references: ['guide2026'],
     calcNote: 'Dose × Peso × 1,44 = mg → ÷ 10 (mg/ml) = ml do fármaco',
-    neofaxProtocol: {
+    standardProtocol: {
       "type": "standard_concentration",
       "standardConcentration": { "value": 10, "unit": "mg/ml" },
       "doseMin": 7,

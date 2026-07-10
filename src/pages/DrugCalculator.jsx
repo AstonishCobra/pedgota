@@ -73,7 +73,7 @@ export default function DrugCalculator() {
     const d = parseFloat(dose);
     if (!drug || !w || !d || w <= 0 || d <= 0) return null;
     try {
-      return calculateStandardProtocol({ ...drug, standardProtocol: drug.neofaxProtocol }, d, w);
+      return calculateStandardProtocol(drug, d, w);
     } catch (e) {
       return { available: false, reason: e.message };
     }
