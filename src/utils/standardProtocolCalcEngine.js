@@ -5,27 +5,16 @@
  * Este módulo NÃO substitui o motor "Guia" já existente no app
  * (algorithms: VASOACTIVE_STANDARD, SEDATION_STANDARD, VASOPRESSIN,
  * DEXMEDETOMIDINE). Ele é um motor complementar, único e genérico,
- * que serve para TODAS as drogas que têm `standardProtocol` preenchido
- * (ver campo `standardProtocol` adicionado via pedidrip_patch_standard.json).
+ * que serve para TODAS as drogas que têm `standardProtocol` preenchido.
  *
  * "Protocolo Padrão" = concentração-padrão FIXA de preparo, baseada em
  * literatura internacional (NeoFax/Micromedex e/ou Lexicomp, confirmada
  * por HSL quando aplicável — a fonte exata varia por droga e está sempre
  * identificada no campo `standardProtocol.source`).
  *
- * Diferente do Guia (que varia a concentração final conforme peso/dose/
- * volume escolhido), o Protocolo Padrão usa uma concentração fixa e
- * calcula diretamente a velocidade de infusão em mL/h.
- *
- * Fórmula geral:
+ * Fórmula geral (velocidade):
  *   velocidade (mL/h) = dose × peso × fatorTempo × fatorConversãoMassa
  *                        ÷ concentração.value
- *
- * onde:
- *   - fatorTempo = 60 se a dose é por minuto (.../min), 1 se é por hora (.../h)
- *   - fatorConversãoMassa converte a unidade de massa da dose (mcg/mg/g/UI)
- *     para a unidade de massa da concentração, quando necessário
- *     (ex.: dose em mcg/kg/min mas concentração em mg/mL)
  */
 
 // ---------------------------------------------------------------------------
@@ -47,7 +36,7 @@ const UNIT_FAMILY = {
 };
 
 function parseDoseUnit(doseUnit) {
-  const parts = doseUnit.split("/"); // ["mcg", "kg", "min"]
+  const parts = doseUnit.split("/");
   if (parts.length !== 3 || parts[1].toLowerCase() !== "kg") {
     throw new Error(
       `Unidade de dose não reconhecida: "${doseUnit}". Esperado formato "<massa>/kg/<tempo>".`
@@ -58,7 +47,7 @@ function parseDoseUnit(doseUnit) {
 }
 
 function parseConcentrationUnit(concentrationUnit) {
-  const parts = concentrationUnit.split("/"); // ["mcg", "ml"]
+  const parts = concentrationUnit.split("/");
   if (parts.length !== 2 || parts[1].toLowerCase() !== "ml") {
     throw new Error(
       `Unidade de concentração não reconhecida: "${concentrationUnit}". Esperado formato "<massa>/ml".`
@@ -163,10 +152,87 @@ function calcStandardConcentration(dose, weightKg, doseUnit, standardProtocol, d
 }
 
 // ---------------------------------------------------------------------------
-// 4. Função de entrada — a partir do registro completo da droga
+// 4. Prescrição completa — volume de fármaco + diluente
 // ---------------------------------------------------------------------------
 
-function calculateStandardProtocol(drug, dose, weightKg) {
+const DILUENT_FULL_NAMES = {
+  "SF 0,9%": "Soro Fisiológico 0,9%",
+  "SG 5%": "Soro Glicosado 5%",
+};
+
+function diluentFullName(diluentName) {
+  return DILUENT_FULL_NAMES[diluentName] || diluentName;
+}
+
+/**
+ * Calcula a prescrição completa do Protocolo Padrão: velocidade de
+ * infusão (mL/h) + quanto de fármaco puro e quanto de diluente usar
+ * para preparar `totalVolumeMl` na concentração-padrão da droga.
+ *
+ * A concentração da AMPOLA (`drug.concentration`, o mesmo campo já usado
+ * pelo protocolo Guia) é usada para calcular a diluição necessária.
+ *
+ * Caso especial: quando a concentração-padrão é IGUAL à da ampola
+ * (ex.: rocurônio, que usa sem diluir), o resultado naturalmente vem
+ * com drugVolumeMl = totalVolumeMl e diluentVolumeMl = 0.
+ */
+function calculatePrescription(drug, dose, weightKg, totalVolumeMl = 50, decimalPlaces = 2) {
+  const rateResult = calcStandardConcentration(
+    dose,
+    weightKg,
+    drug.doseUnit,
+    drug.standardProtocol,
+    decimalPlaces
+  );
+
+  const standardConc = drug.standardProtocol.standardConcentration;
+  const ampouleConc = drug.concentration;
+
+  const standardMassUnit = parseConcentrationUnit(standardConc.unit);
+  const ampouleMassUnit = parseConcentrationUnit(ampouleConc.unit);
+  const factor = massConversionFactor(ampouleMassUnit, standardMassUnit);
+  const ampouleConcInStandardUnit = ampouleConc.value * factor;
+
+  const drugVolumeMlRaw = (standardConc.value * totalVolumeMl) / ampouleConcInStandardUnit;
+  const drugVolumeMl = Number(drugVolumeMlRaw.toFixed(decimalPlaces));
+  const diluentVolumeMl = Number((totalVolumeMl - drugVolumeMl).toFixed(decimalPlaces));
+
+  if (drugVolumeMl > totalVolumeMl) {
+    throw new Error(
+      `Volume de fármaco necessário (${drugVolumeMl} mL) excede o volume total de preparo (${totalVolumeMl} mL) para atingir ${standardConc.value} ${standardConc.unit}. Aumente o volume total ou revise a concentração-padrão.`
+    );
+  }
+  if (diluentVolumeMl < 0) {
+    throw new Error("Volume de diluente calculado ficou negativo — revise os parâmetros de entrada.");
+  }
+
+  const diluentName = drug.preparation?.diluent ?? "diluente compatível";
+
+  const prescriptionLines = [
+    `${drug.name} (${drug.presentation}) ----------- ${drugVolumeMl} ml`,
+    `${diluentFullName(diluentName)} ---------- ${diluentVolumeMl} ml`,
+    `Infundir ${rateResult.rateMlPerHour} ml/h, EV, em bomba de infusão contínua (BIC)`,
+    `Nesta solução: ${rateResult.rateMlPerHour} ml/h = ${dose} ${drug.doseUnit}`,
+  ];
+
+  return {
+    ...rateResult,
+    drugVolumeMl,
+    diluentVolumeMl,
+    totalVolumeMl,
+    prescriptionLines,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 5. Função de entrada — a partir do registro completo da droga
+// ---------------------------------------------------------------------------
+
+/**
+ * Retorna `available: false` se a droga não tiver `standardProtocol`
+ * (caso de vasopressina e nitroprussiato, por decisão de prudência).
+ */
+function calculateStandardProtocol(drug, dose, weightKg, totalVolumeMl = 50) {
   if (!drug.standardProtocol) {
     return {
       available: false,
@@ -176,12 +242,7 @@ function calculateStandardProtocol(drug, dose, weightKg) {
     };
   }
 
-  const result = calcStandardConcentration(
-    dose,
-    weightKg,
-    drug.doseUnit,
-    drug.standardProtocol
-  );
+  const result = calculatePrescription(drug, dose, weightKg, totalVolumeMl);
 
   return {
     available: true,
@@ -192,11 +253,12 @@ function calculateStandardProtocol(drug, dose, weightKg) {
 }
 
 // ---------------------------------------------------------------------------
-// 5. Exports
+// 6. Exports
 // ---------------------------------------------------------------------------
 
 export {
   calcStandardConcentration,
+  calculatePrescription,
   calculateStandardProtocol,
   validateDoseRange,
   massConversionFactor,
