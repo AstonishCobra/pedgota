@@ -6,7 +6,8 @@ const drugs = getDrugs();
 import { ALERT_MESSAGES } from '@/utils/alertMessages';
 import { calculateStandardProtocol } from '@/utils/standardProtocolCalcEngine';
 import { getReferenceTitle } from '@/data/references';
-import { Copy, Check, ChevronLeft, AlertTriangle, Info, Zap } from 'lucide-react';
+import { ChevronLeft, AlertTriangle, Info } from 'lucide-react';
+import PrescriptionBox from '@/components/PrescriptionBox';
 
 const VOLUME_OPTIONS = [
   { label: '24 ml', value: 24, rate: '1 ml/h' },
@@ -82,6 +83,9 @@ export default function DrugCalculator() {
   const doseValue = parseFloat(dose);
   const isDoseOutOfRange = drug && !isNaN(doseValue) && (doseValue < drug.doseMin || doseValue > drug.doseMax);
 
+  const displayDoseMin = protocolMode === 'standard' && drug?.standardProtocol ? drug.standardProtocol.doseMin : drug.doseMin;
+  const displayDoseMax = protocolMode === 'standard' && drug?.standardProtocol ? drug.standardProtocol.doseMax : drug.doseMax;
+
   const weightValue = parseFloat(weight);
   const isWeightUnusual = !isNaN(weightValue) && weightValue > 50;
 
@@ -90,14 +94,18 @@ export default function DrugCalculator() {
     return sev === 'black_box' || sev === 'critical';
   });
 
+  const activePrescriptionLines = protocolMode === 'standard'
+    ? (standardResult?.available ? standardResult.prescriptionLines : null)
+    : (result ? result.prescriptionLines : null);
+
   const handleCopy = useCallback(() => {
-    if (!result) return;
-    const text = result.prescriptionLines.join('\n');
+    if (!activePrescriptionLines) return;
+    const text = activePrescriptionLines.join('\n');
     navigator.clipboard.writeText(text).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
-  }, [result]);
+  }, [activePrescriptionLines]);
 
   if (!drug) {
     return (
@@ -223,13 +231,13 @@ export default function DrugCalculator() {
                     />
                   </div>
                   <p className="text-xs text-slate-500">
-                    {drug.doseUnit} &nbsp;·&nbsp; {drug.doseMin}–{drug.doseMax}
+                    {drug.doseUnit} &nbsp;·&nbsp; {displayDoseMin}–{displayDoseMax}
                   </p>
                 </div>
               </div>
 
               {/* Alerta: dose fora da faixa */}
-              {isDoseOutOfRange && (
+              {protocolMode === 'guia' && isDoseOutOfRange && (
                 <div className="flex items-start gap-2 rounded-lg border border-red-500/40 bg-red-500/10 p-3">
                   <AlertTriangle size={15} className="text-red-400 flex-shrink-0 mt-0.5" />
                   <p className="text-red-300 text-sm leading-snug">
@@ -249,7 +257,7 @@ export default function DrugCalculator() {
               )}
 
               {/* Dose tips */}
-              {drug.doseTips && (
+              {protocolMode === 'guia' && drug.doseTips && (
                 <div className="space-y-1">
                   {drug.doseTips.map((tip, i) => (
                     <div key={i} className="flex items-center gap-2 text-xs">
@@ -316,6 +324,13 @@ export default function DrugCalculator() {
                         <p className="text-[11px] text-slate-600 leading-snug">Fonte: {standardResult.source}</p>
                       )}
                     </div>
+                    <PrescriptionBox
+                      lines={standardResult.prescriptionLines}
+                      onCopy={handleCopy}
+                      copied={copied}
+                      accentText={colors.text}
+                      withTopBorder
+                    />
                   </div>
                 ) : (
                   <div className="rounded-xl border border-slate-700 bg-slate-800/30 p-4">
@@ -386,33 +401,12 @@ export default function DrugCalculator() {
                   </div>
                 </div>
 
-                {/* Prescrição */}
-                <div className="p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <Zap size={14} className={colors.text} />
-                      <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                        Prescrição
-                      </span>
-                    </div>
-                    <button
-                      onClick={handleCopy}
-                      className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium transition-all ${
-                        copied
-                          ? 'bg-green-500/20 text-green-400 border border-green-500/40'
-                          : 'bg-slate-700 text-slate-300 border border-slate-600 hover:bg-slate-600'
-                      }`}
-                    >
-                      {copied ? <Check size={13} /> : <Copy size={13} />}
-                      {copied ? 'Copiado!' : 'Copiar'}
-                    </button>
-                  </div>
-                  <div className="bg-white rounded-lg p-4 border-l-4 border-slate-300">
-                    <pre className="font-mono text-sm text-slate-800 leading-relaxed whitespace-pre-wrap">
-                      {result.prescriptionLines.join('\n')}
-                    </pre>
-                  </div>
-                </div>
+                <PrescriptionBox
+                  lines={result.prescriptionLines}
+                  onCopy={handleCopy}
+                  copied={copied}
+                  accentText={colors.text}
+                />
               </div>
               </>
             ) : (
