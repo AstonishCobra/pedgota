@@ -206,7 +206,29 @@ const ALERT_MESSAGES = {
   },
   no_fixed_concentration_engine: {
     severity: "info",
-    message: "Não há concentração-padrão fixa definida pelas fontes consultadas para esta droga — protocolo NeoFax não disponível.",
+    message: "Não há concentração-padrão fixa definida pelas fontes consultadas para esta droga — Protocolo Padrão não disponível.",
+  },
+
+  // ---- Códigos legados (já existentes no drugs.js antes do cruzamento de fontes) ----
+  photoprotection: {
+    severity: "info",
+    message: "Fotossensível — proteger da luz durante preparo e infusão.",
+  },
+  cyanide_toxicity_risk: {
+    severity: "warning",
+    message: "Risco de toxicidade por cianeto, especialmente em uso prolongado ou altas doses.",
+  },
+  no_loading_dose: {
+    severity: "info",
+    message: "Evitar dose de ataque em crianças — risco de bradicardia e hipotensão.",
+  },
+  mandatory_sedation: {
+    severity: "critical",
+    message: "Uso obrigatoriamente associado a sedação e analgesia adequadas.",
+  },
+  no_sedative_effect: {
+    severity: "info",
+    message: "Não possui efeito sedativo ou analgésico — paralisa sem sedar.",
   },
 };
 
