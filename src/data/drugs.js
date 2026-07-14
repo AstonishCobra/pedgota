@@ -446,7 +446,7 @@ export const drugs = [
         "source": "Lexicomp Pediatric/Neonatal, 2021, p.932-939"
       }
     ],
-    alerts: ['black_box_addiction_abuse_misuse', 'black_box_respiratory_depression', 'black_box_cyp3a4_interaction', 'black_box_cns_depressant_interaction', 'chest_wall_rigidity', 'withdrawal_syndrome_prolonged_infusion', 'rapid_tolerance_development'],
+    alerts: ['black_box_respiratory_depression', 'black_box_cyp3a4_interaction', 'black_box_cns_depressant_interaction', 'chest_wall_rigidity', 'withdrawal_syndrome_prolonged_infusion', 'rapid_tolerance_development'],
   },
 
   // ─── SEDAÇÃO ────────────────────────────────────────────────────────────────

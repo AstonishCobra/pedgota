@@ -36,7 +36,7 @@ const ALERT_MESSAGES = {
   },
   black_box_cns_depressant_interaction: {
     severity: "black_box",
-    message: "Tarja preta: risco grave com depressores do SNC (álcool, benzodiazepínicos).",
+    message: "Tarja preta: risco grave com depressores do SNC (ex.: benzodiazepínicos).",
   },
   black_box_opioid_concomitant_use: {
     severity: "black_box",

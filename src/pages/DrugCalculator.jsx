@@ -94,6 +94,11 @@ export default function DrugCalculator() {
     return sev === 'black_box' || sev === 'critical';
   });
 
+  const nonCriticalAlerts = (drug?.alerts || []).filter((code) => {
+    const sev = ALERT_MESSAGES[code]?.severity;
+    return sev === 'warning' || sev === 'info';
+  });
+
   const activePrescriptionLines = protocolMode === 'standard'
     ? (standardResult?.available ? standardResult.prescriptionLines : null)
     : (result ? result.prescriptionLines : null);
@@ -489,6 +494,46 @@ export default function DrugCalculator() {
                 ))}
               </ul>
             </InfoSection>
+
+            {nonCriticalAlerts.length > 0 && (
+              <InfoSection title="Alertas Clínicos" icon="🔔">
+                <ul className="space-y-1">
+                  {nonCriticalAlerts.map((code) => (
+                    <li key={code} className="text-sm text-slate-300 flex items-start gap-2">
+                      <span className="text-slate-500 mt-0.5">•</span> {ALERT_MESSAGES[code]?.message || code}
+                    </li>
+                  ))}
+                </ul>
+              </InfoSection>
+            )}
+
+            {drug.standardProtocol && (
+              <InfoSection title="Protocolo Padrão — Fontes e Metodologia" icon="📚">
+                <p className="text-sm text-slate-300 leading-relaxed">{drug.standardProtocol.notes}</p>
+                {drug.standardProtocol.source && (
+                  <p className="text-xs text-slate-600 mt-2">Fonte: {drug.standardProtocol.source}</p>
+                )}
+              </InfoSection>
+            )}
+
+            {drug.referenceOnly?.length > 0 && (
+              <InfoSection title="Referências Adicionais" icon="🔖">
+                <div className="space-y-3">
+                  {drug.referenceOnly.map((ref, i) => (
+                    <div key={i} className="space-y-1">
+                      <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
+                        {ref.sourceType}
+                      </p>
+                      <p className="text-sm text-slate-300 leading-relaxed">{ref.notes}</p>
+                      {ref.source && (
+                        <p className="text-xs text-slate-600">{ref.source}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </InfoSection>
+            )}
+
             {drug.references?.length > 0 && (
               <p className="text-xs text-slate-600 px-1">
                 Fonte: {drug.references.map((id) => getReferenceTitle(id)).join(', ')}
