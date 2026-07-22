@@ -14,10 +14,10 @@ import DrugForm from './DrugForm';
 import BackupsPanel from './BackupsPanel';
 
 const CATEGORY_LABELS = {
-  [DRUG_CATEGORIES.VASOACTIVE]: { label: 'Vasoativa', color: 'text-amber-400 bg-amber-500/10 border-amber-500/30' },
-  [DRUG_CATEGORIES.SEDATIVE]: { label: 'Sedação', color: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/30' },
-  [DRUG_CATEGORIES.ANALGESIA]: { label: 'Analgesia', color: 'text-violet-400 bg-violet-500/10 border-violet-500/30' },
-  [DRUG_CATEGORIES.BNM]: { label: 'BNM', color: 'text-red-400 bg-red-500/10 border-red-500/30' },
+  [DRUG_CATEGORIES.VASOACTIVE]: { label: 'Vasoativa', color: 'text-amber-600 bg-amber-500/10 border-amber-500/30' },
+  [DRUG_CATEGORIES.SEDATIVE]: { label: 'Sedação', color: 'text-indigo-600 bg-indigo-500/10 border-indigo-500/30' },
+  [DRUG_CATEGORIES.ANALGESIA]: { label: 'Analgesia', color: 'text-violet-600 bg-violet-500/10 border-violet-500/30' },
+  [DRUG_CATEGORIES.BNM]: { label: 'BNM', color: 'text-red-600 bg-red-500/10 border-red-500/30' },
 };
 
 const TABS = ['Medicamentos', 'Backups', 'Configurações'];
@@ -90,20 +90,20 @@ export default function AdminPanel({ onLock }) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <div className="border-b border-slate-800 sticky top-0 z-10 bg-slate-900/95 backdrop-blur">
+      <div className="border-b border-border sticky top-0 z-10 bg-background/95 backdrop-blur">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center gap-3">
-          <Link to="/" className="text-slate-400 hover:text-slate-200 transition-colors">
+          <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">
             <ChevronLeft size={22} />
           </Link>
           <div className="flex-1">
-            <h1 className="text-base font-bold text-slate-100">Painel Administrativo</h1>
-            <p className="text-xs text-slate-500">{drugs.length} medicamentos cadastrados</p>
+            <h1 className="text-base font-bold text-foreground">Painel Administrativo</h1>
+            <p className="text-xs text-muted-foreground">{drugs.length} medicamentos cadastrados</p>
           </div>
           <button
             onClick={onLock}
-            className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-300 border border-slate-700 hover:border-slate-500 px-3 py-1.5 transition-colors"
+            className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-muted-foreground border border-border hover:border-primary px-3 py-1.5 transition-colors"
           >
             <Shield size={13} /> Sair
           </button>
@@ -117,8 +117,8 @@ export default function AdminPanel({ onLock }) {
               onClick={() => setTab(t)}
               className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                 tab === t
-                  ? 'border-amber-500 text-amber-400'
-                  : 'border-transparent text-slate-500 hover:text-slate-300'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
               {t}
@@ -135,22 +135,22 @@ export default function AdminPanel({ onLock }) {
             {/* Barra de ações */}
             <div className="flex gap-3 flex-wrap">
               <div className="relative flex-1 min-w-48">
-                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 <input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Buscar medicamento..."
-                  className="w-full bg-slate-800 border border-slate-700 pl-9 pr-4 py-2 text-sm text-slate-200 focus:outline-none focus:border-slate-500 placeholder:text-slate-600"
+                  className="w-full bg-card border border-border pl-9 pr-4 py-2 text-sm text-foreground focus:outline-none focus:border-primary placeholder:text-muted-foreground"
                 />
                 {search && (
-                  <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300">
+                  <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground">
                     <X size={13} />
                   </button>
                 )}
               </div>
               <button
                 onClick={() => setEditing('new')}
-                className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-900 text-sm font-bold transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-bold transition-colors"
               >
                 <Plus size={15} /> Novo Medicamento
               </button>
@@ -160,62 +160,62 @@ export default function AdminPanel({ onLock }) {
             <div className="flex gap-2 flex-wrap">
               <button
                 onClick={exportJSON}
-                className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-slate-700 text-slate-400 hover:text-slate-200 hover:border-slate-500 transition-colors"
+                className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-border text-muted-foreground hover:text-foreground hover:border-primary transition-colors"
               >
                 <Download size={13} /> Exportar JSON
               </button>
               <button
                 onClick={() => fileRef.current.click()}
-                className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-slate-700 text-slate-400 hover:text-slate-200 hover:border-slate-500 transition-colors"
+                className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-border text-muted-foreground hover:text-foreground hover:border-primary transition-colors"
               >
                 <Upload size={13} /> Importar JSON
               </button>
               <button
                 onClick={handleReset}
-                className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-slate-700 text-slate-400 hover:text-amber-400 hover:border-amber-500/40 transition-colors"
+                className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-border text-muted-foreground hover:text-primary hover:border-primary/40 transition-colors"
               >
                 <RotateCcw size={13} /> Restaurar Padrão
               </button>
               <input ref={fileRef} type="file" accept=".json" className="hidden" onChange={handleImport} />
             </div>
             {importError && (
-              <div className="flex items-center gap-2 text-red-300 text-xs border border-red-500/30 bg-red-500/10 px-3 py-2">
+              <div className="flex items-center gap-2 text-red-600 text-xs border border-red-500/30 bg-red-500/10 px-3 py-2">
                 <AlertTriangle size={13} /> {importError}
               </div>
             )}
 
             {/* Lista de medicamentos */}
-            <div className="border border-slate-800 divide-y divide-slate-800">
+            <div className="border border-border divide-y divide-border">
               {filtered.length === 0 && (
-                <div className="py-10 text-center text-slate-600 text-sm">Nenhum resultado encontrado.</div>
+                <div className="py-10 text-center text-muted-foreground text-sm">Nenhum resultado encontrado.</div>
               )}
               {filtered.map((drug) => {
-                const cat = CATEGORY_LABELS[drug.category] ?? { label: drug.category, color: 'text-slate-400 bg-slate-700 border-slate-600' };
+                const cat = CATEGORY_LABELS[drug.category] ?? { label: drug.category, color: 'text-muted-foreground bg-muted border-border' };
                 return (
-                  <div key={drug.id} className="flex items-center gap-4 px-4 py-3.5 hover:bg-slate-800/40 transition-colors">
+                  <div key={drug.id} className="flex items-center gap-4 px-4 py-3.5 hover:bg-card/40 transition-colors">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-semibold text-sm text-slate-200">{drug.name}</span>
+                        <span className="font-semibold text-sm text-foreground">{drug.name}</span>
                         <span className={`text-[10px] font-bold px-1.5 py-0.5 border leading-none ${cat.color}`}>
                           {cat.label}
                         </span>
                         {drug.alerts?.length > 0 && (
-                          <span className="text-[10px] bg-red-500/20 text-red-300 border border-red-500/30 px-1.5 py-0.5 font-bold leading-none">⚠ ALERTA</span>
+                          <span className="text-[10px] bg-red-500/15 text-red-700 border border-red-500/30 px-1.5 py-0.5 font-bold leading-none">⚠ ALERTA</span>
                         )}
                       </div>
-                      <p className="text-xs text-slate-600 mt-0.5">{drug.presentation} · {drug.doseMin}–{drug.doseMax} {drug.doseUnit}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{drug.presentation} · {drug.doseMin}–{drug.doseMax} {drug.doseUnit}</p>
                     </div>
                     <div className="flex items-center gap-1 flex-shrink-0">
                       <button
                         onClick={() => setEditing(drug)}
-                        className="p-2 text-slate-500 hover:text-amber-400 hover:bg-amber-500/10 transition-colors"
+                        className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
                         title="Editar"
                       >
                         <Pencil size={15} />
                       </button>
                       <button
                         onClick={() => setConfirmDelete(drug)}
-                        className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                        className="p-2 text-muted-foreground hover:text-red-600 hover:bg-red-500/10 transition-colors"
                         title="Excluir"
                       >
                         <Trash2 size={15} />
@@ -236,40 +236,40 @@ export default function AdminPanel({ onLock }) {
         {/* ── TAB: CONFIGURAÇÕES ── */}
         {tab === 'Configurações' && (
           <div className="max-w-sm space-y-6">
-            <div className="border border-slate-700 p-5 space-y-4">
+            <div className="border border-border p-5 space-y-4">
               <div className="flex items-center gap-2">
-                <KeyRound size={16} className="text-amber-400" />
-                <h3 className="font-bold text-slate-200 text-sm">Alterar Senha</h3>
+                <KeyRound size={16} className="text-primary" />
+                <h3 className="font-bold text-foreground text-sm">Alterar Senha</h3>
               </div>
               <form onSubmit={handleChangePass} className="space-y-3">
                 <div>
-                  <label className="block text-xs text-slate-500 mb-1.5">Nova senha</label>
+                  <label className="block text-xs text-muted-foreground mb-1.5">Nova senha</label>
                   <input
                     type="password"
                     value={newPass}
                     onChange={(e) => { setNewPass(e.target.value); setPassMsg(''); }}
                     placeholder="Mínimo 6 caracteres"
-                    className="w-full bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-slate-500 placeholder:text-slate-600"
+                    className="w-full bg-background border border-border px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary placeholder:text-muted-foreground"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-slate-500 mb-1.5">Confirmar senha</label>
+                  <label className="block text-xs text-muted-foreground mb-1.5">Confirmar senha</label>
                   <input
                     type="password"
                     value={newPass2}
                     onChange={(e) => { setNewPass2(e.target.value); setPassMsg(''); }}
                     placeholder="Repita a senha"
-                    className="w-full bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-slate-500 placeholder:text-slate-600"
+                    className="w-full bg-background border border-border px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary placeholder:text-muted-foreground"
                   />
                 </div>
                 {passMsg && (
-                  <p className={`text-xs ${passMsg.includes('sucesso') ? 'text-emerald-400' : 'text-red-400'}`}>
+                  <p className={`text-xs ${passMsg.includes('sucesso') ? 'text-emerald-600' : 'text-red-600'}`}>
                     {passMsg}
                   </p>
                 )}
                 <button
                   type="submit"
-                  className="w-full py-2 text-sm font-bold bg-amber-500 hover:bg-amber-400 text-slate-900 transition-colors"
+                  className="w-full py-2 text-sm font-bold bg-primary hover:bg-primary/90 text-primary-foreground transition-colors"
                 >
                   Alterar Senha
                 </button>
@@ -290,21 +290,21 @@ export default function AdminPanel({ onLock }) {
 
       {/* Modal: Confirmação de exclusão */}
       {confirmDelete && (
-        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center px-4">
-          <div className="bg-slate-800 border border-slate-700 p-6 max-w-sm w-full space-y-4">
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center px-4">
+          <div className="bg-card border border-border p-6 max-w-sm w-full space-y-4">
             <div className="flex items-center gap-2">
-              <AlertTriangle size={16} className="text-red-400" />
-              <h3 className="font-bold text-slate-200">Excluir Medicamento</h3>
+              <AlertTriangle size={16} className="text-red-600" />
+              <h3 className="font-bold text-foreground">Excluir Medicamento</h3>
             </div>
-            <p className="text-sm text-slate-400">
-              Tem certeza que deseja excluir <strong className="text-slate-200">{confirmDelete.name}</strong>?
+            <p className="text-sm text-muted-foreground">
+              Tem certeza que deseja excluir <strong className="text-foreground">{confirmDelete.name}</strong>?
               Um backup automático será criado antes.
             </p>
             <div className="flex gap-3 justify-end">
-              <button onClick={() => setConfirmDelete(null)} className="px-4 py-2 text-sm border border-slate-700 text-slate-400 hover:text-slate-200 transition-colors">
+              <button onClick={() => setConfirmDelete(null)} className="px-4 py-2 text-sm border border-border text-muted-foreground hover:text-foreground transition-colors">
                 Cancelar
               </button>
-              <button onClick={() => handleDelete(confirmDelete.id)} className="px-4 py-2 text-sm font-bold bg-red-500 hover:bg-red-400 text-white transition-colors">
+              <button onClick={() => handleDelete(confirmDelete.id)} className="px-4 py-2 text-sm font-bold bg-destructive hover:bg-destructive/90 text-destructive-foreground transition-colors">
                 Excluir
               </button>
             </div>

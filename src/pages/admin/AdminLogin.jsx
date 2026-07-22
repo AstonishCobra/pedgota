@@ -19,27 +19,27 @@ export default function AdminLogin({ onSuccess }) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="flex items-center gap-3 mb-8 justify-center">
-          <div className="w-10 h-10 bg-amber-500/15 border border-amber-500/30 flex items-center justify-center">
-            <Activity size={20} className="text-amber-400" />
+          <div className="w-10 h-10 bg-primary/15 border border-primary/30 flex items-center justify-center">
+            <Activity size={20} className="text-primary" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-slate-100 leading-none">PediDrip</h1>
-            <p className="text-xs text-slate-500">Painel Administrativo</p>
+            <h1 className="text-xl font-bold text-foreground leading-none">PediDrip</h1>
+            <p className="text-xs text-muted-foreground">Painel Administrativo</p>
           </div>
         </div>
 
-        <div className="border border-slate-700 bg-slate-800/50 p-6">
+        <div className="border border-border bg-card p-6 rounded-xl">
           <div className="flex items-center gap-2 mb-6">
-            <Lock size={16} className="text-amber-400" />
-            <h2 className="text-base font-bold text-slate-200">Acesso Restrito</h2>
+            <Lock size={16} className="text-primary" />
+            <h2 className="text-base font-bold text-foreground">Acesso Restrito</h2>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+              <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                 Senha
               </label>
               <div className="relative">
@@ -49,24 +49,24 @@ export default function AdminLogin({ onSuccess }) {
                   onChange={(e) => { setPass(e.target.value); setError(''); }}
                   placeholder="Digite a senha"
                   autoFocus
-                  className="w-full bg-slate-900 border border-slate-700 px-4 py-3 text-slate-100 text-sm focus:outline-none focus:border-amber-500/50 pr-10 placeholder:text-slate-600"
+                  className="w-full bg-background border border-border px-4 py-3 text-foreground text-sm focus:outline-none focus:border-primary/50 pr-10 placeholder:text-muted-foreground/60"
                 />
                 <button
                   type="button"
                   onClick={() => setShow(!show)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
                   {show ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
               </div>
-              {error && <p className="text-red-400 text-xs mt-1.5">{error}</p>}
-              <p className="text-slate-600 text-xs mt-1.5">Padrão: <span className="font-mono">pedidrip2024</span></p>
+              {error && <p className="text-destructive text-xs mt-1.5">{error}</p>}
+              <p className="text-muted-foreground text-xs mt-1.5">Padrão: <span className="font-mono">pedidrip2024</span></p>
             </div>
 
             <button
               type="submit"
               disabled={!pass}
-              className="w-full bg-amber-500 hover:bg-amber-400 disabled:opacity-40 disabled:cursor-not-allowed text-slate-900 font-bold py-3 text-sm transition-colors"
+              className="w-full bg-primary hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed text-primary-foreground font-bold py-3 text-sm transition-colors rounded-lg"
             >
               Entrar no Painel
             </button>

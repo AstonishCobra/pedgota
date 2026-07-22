@@ -13,14 +13,14 @@ export default function SoonModuleCard({ module }) {
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="font-bold text-slate-200 text-base leading-tight">{module.label}</span>
-          <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 bg-slate-700 text-slate-400 border border-slate-600 leading-none">
+          <span className="font-bold text-foreground text-base leading-tight">{module.label}</span>
+          <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 bg-muted text-muted-foreground border border-border leading-none">
             Em breve
           </span>
         </div>
         
       </div>
-      <ChevronRight size={16} className="text-slate-700 flex-shrink-0" />
-    </div>);
-
+      <ChevronRight size={16} className="text-muted-foreground flex-shrink-0" />
+    </div>
+  );
 }

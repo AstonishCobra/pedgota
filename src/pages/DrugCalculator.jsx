@@ -17,35 +17,35 @@ const VOLUME_OPTIONS = [
 
 const categoryColor = {
   [DRUG_CATEGORIES.VASOACTIVE]: {
-    accent: '#F59E0B',
+    accent: '#D97706',
     bg: 'bg-amber-500/10',
     border: 'border-amber-500/30',
-    text: 'text-amber-400',
-    badge: 'bg-amber-500/20 text-amber-300 border border-amber-500/30',
+    text: 'text-amber-600',
+    badge: 'bg-amber-500/15 text-amber-700 border border-amber-500/30',
     label: 'Vasoativa',
   },
   [DRUG_CATEGORIES.SEDATIVE]: {
-    accent: 'hsl(var(--secondary))',
+    accent: '#4F46E5',
     bg: 'bg-indigo-500/10',
     border: 'border-indigo-500/30',
-    text: 'text-indigo-400',
-    badge: 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30',
+    text: 'text-indigo-600',
+    badge: 'bg-indigo-500/15 text-indigo-700 border border-indigo-500/30',
     label: 'Sedação',
   },
   [DRUG_CATEGORIES.ANALGESIA]: {
-    accent: 'text-violet-400',
+    accent: '#7C3AED',
     bg: 'bg-violet-500/10',
     border: 'border-violet-500/30',
-    text: 'text-violet-400',
-    badge: 'bg-violet-500/20 text-violet-300 border border-violet-500/30',
+    text: 'text-violet-600',
+    badge: 'bg-violet-500/15 text-violet-700 border border-violet-500/30',
     label: 'Analgesia',
   },
   [DRUG_CATEGORIES.BNM]: {
-    accent: 'hsl(var(--destructive))',
+    accent: '#DC2626',
     bg: 'bg-red-500/10',
     border: 'border-red-500/30',
-    text: 'text-red-400',
-    badge: 'bg-red-500/20 text-red-300 border border-red-500/30',
+    text: 'text-red-600',
+    badge: 'bg-red-500/15 text-red-700 border border-red-500/30',
     label: 'Bloqueador Neuromuscular',
   },
 };
@@ -114,9 +114,9 @@ export default function DrugCalculator() {
 
   if (!drug) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <p className="text-slate-400 mb-4">Droga não encontrada.</p>
+          <p className="text-muted-foreground mb-4">Droga não encontrada.</p>
           <Link to="/" className="text-amber-400 hover:underline">← Voltar</Link>
         </div>
       </div>
@@ -124,21 +124,21 @@ export default function DrugCalculator() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <div className={`border-b border-slate-800 sticky top-0 z-10 bg-slate-900/95 backdrop-blur`}>
+      <div className={`border-b border-border sticky top-0 z-10 bg-background/95 backdrop-blur`}>
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
-          <Link to="/" className="text-slate-400 hover:text-slate-200 transition-colors">
+          <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">
             <ChevronLeft size={22} />
           </Link>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-lg font-bold text-slate-100 leading-tight">{drug.name}</h1>
+              <h1 className="text-lg font-bold text-foreground leading-tight">{drug.name}</h1>
               <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${colors.badge}`}>
                 {colors.label}
               </span>
             </div>
-            <p className="text-xs text-slate-500 truncate">{drug.presentation}</p>
+            <p className="text-xs text-muted-foreground truncate">{drug.presentation}</p>
           </div>
         </div>
 
@@ -154,7 +154,7 @@ export default function DrugCalculator() {
               className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === tab.id
                   ? `border-current ${colors.text}`
-                  : 'border-transparent text-slate-500 hover:text-slate-300'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
               {tab.label}
@@ -170,7 +170,7 @@ export default function DrugCalculator() {
             <div className={`rounded-xl border ${colors.border} ${colors.bg} p-5 space-y-5`}>
               {/* Seletor de protocolo */}
               <div className="space-y-2">
-                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                   Protocolo de cálculo
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -179,7 +179,7 @@ export default function DrugCalculator() {
                     className={`rounded-lg py-2 text-sm font-semibold border transition-all ${
                       protocolMode === 'guia'
                         ? `${colors.bg} ${colors.border} ${colors.text}`
-                        : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-500'
+                        : 'bg-card border-border text-muted-foreground hover:border-primary'
                     }`}
                   >
                     Guia
@@ -189,7 +189,7 @@ export default function DrugCalculator() {
                     className={`rounded-lg py-2 text-sm font-semibold border transition-all ${
                       protocolMode === 'standard'
                         ? `${colors.bg} ${colors.border} ${colors.text}`
-                        : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-500'
+                        : 'bg-card border-border text-muted-foreground hover:border-primary'
                     }`}
                   >
                     Protocolo Padrão
@@ -200,7 +200,7 @@ export default function DrugCalculator() {
               <div className="grid grid-cols-2 gap-4">
                 {/* Peso */}
                 <div className="space-y-2">
-                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                  <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Peso do paciente
                   </label>
                   <div className="relative">
@@ -212,15 +212,15 @@ export default function DrugCalculator() {
                       value={weight}
                       onChange={(e) => setWeight(e.target.value)}
                       placeholder="0,0"
-                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-3 text-xl font-bold text-slate-100 focus:outline-none focus:border-slate-500 pr-10 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+                      className="w-full bg-card border border-border rounded-lg px-3 py-3 text-xl font-bold text-foreground focus:outline-none focus:border-primary pr-10 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
                     />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm font-medium">kg</span>
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-medium">kg</span>
                   </div>
                 </div>
 
                 {/* Dose */}
                 <div className="space-y-2">
-                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                  <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Dose desejada
                   </label>
                   <div className="relative">
@@ -232,10 +232,10 @@ export default function DrugCalculator() {
                       value={dose}
                       onChange={(e) => setDose(e.target.value)}
                       placeholder="0"
-                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-3 text-xl font-bold text-slate-100 focus:outline-none focus:border-slate-500 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+                      className="w-full bg-card border border-border rounded-lg px-3 py-3 text-xl font-bold text-foreground focus:outline-none focus:border-primary [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
                     />
                   </div>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground">
                     {drug.doseUnit} &nbsp;·&nbsp; {displayDoseMin}–{displayDoseMax}
                   </p>
                 </div>
@@ -244,8 +244,8 @@ export default function DrugCalculator() {
               {/* Alerta: dose fora da faixa */}
               {protocolMode === 'guia' && isDoseOutOfRange && (
                 <div className="flex items-start gap-2 rounded-lg border border-red-500/40 bg-red-500/10 p-3">
-                  <AlertTriangle size={15} className="text-red-400 flex-shrink-0 mt-0.5" />
-                  <p className="text-red-300 text-sm leading-snug">
+                  <AlertTriangle size={15} className="text-red-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-red-700 text-sm leading-snug">
                     Dose de {dose} {drug.doseUnit} está fora da faixa recomendada ({drug.doseMin}–{drug.doseMax} {drug.doseUnit}).
                   </p>
                 </div>
@@ -254,8 +254,8 @@ export default function DrugCalculator() {
               {/* Alerta: peso incomum para pediatria */}
               {isWeightUnusual && (
                 <div className="flex items-start gap-2 rounded-lg border border-orange-500/40 bg-orange-500/10 p-3">
-                  <AlertTriangle size={15} className="text-orange-400 flex-shrink-0 mt-0.5" />
-                  <p className="text-orange-300 text-sm leading-snug">
+                  <AlertTriangle size={15} className="text-orange-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-orange-700 text-sm leading-snug">
                     Peso de {weight} kg é incomum para a faixa pediátrica. Confira o peso informado.
                   </p>
                 </div>
@@ -267,8 +267,8 @@ export default function DrugCalculator() {
                   {drug.doseTips.map((tip, i) => (
                     <div key={i} className="flex items-center gap-2 text-xs">
                       <span className={`font-mono font-semibold ${colors.text}`}>{tip.range}</span>
-                      <span className="text-slate-500">→</span>
-                      <span className="text-slate-400">{tip.effect}</span>
+                      <span className="text-muted-foreground">→</span>
+                      <span className="text-muted-foreground">{tip.effect}</span>
                     </div>
                   ))}
                 </div>
@@ -277,7 +277,7 @@ export default function DrugCalculator() {
               {/* Volume total */}
               {protocolMode === 'guia' && drug.algorithm !== 'VASOPRESSIN' && drug.algorithm !== 'DEXMEDETOMIDINE' && (
                 <div className="space-y-2">
-                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                  <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Volume total de preparo
                   </label>
                   <div className="grid grid-cols-3 gap-2">
@@ -288,7 +288,7 @@ export default function DrugCalculator() {
                         className={`rounded-lg py-2 text-sm font-semibold border transition-all ${
                           totalVolume === opt.value
                             ? `${colors.bg} ${colors.border} ${colors.text}`
-                            : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-500'
+                            : 'bg-card border-border text-muted-foreground hover:border-primary'
                         }`}
                       >
                         {opt.label}
@@ -304,29 +304,29 @@ export default function DrugCalculator() {
             {protocolMode === 'standard' ? (
               standardResult ? (
                 standardResult.available ? (
-                  <div className="rounded-xl border border-slate-700 bg-slate-800/50 overflow-hidden">
-                    <div className="p-5 text-center border-b border-slate-700">
-                      <div className="text-3xl font-bold text-slate-100">{standardResult.rateMlPerHour}</div>
-                      <div className="text-xs text-slate-500 mt-1">mL/h — bomba de infusão contínua</div>
+                  <div className="rounded-xl border border-border bg-card/50 overflow-hidden">
+                    <div className="p-5 text-center border-b border-border">
+                      <div className="text-3xl font-bold text-foreground">{standardResult.rateMlPerHour}</div>
+                      <div className="text-xs text-muted-foreground mt-1">mL/h — bomba de infusão contínua</div>
                     </div>
                     <div className="p-4 space-y-3">
                       {!standardResult.doseValidation.inRange && (
                         <div className="flex items-start gap-2 rounded-lg border border-orange-500/40 bg-orange-500/10 p-3">
-                          <AlertTriangle size={15} className="text-orange-400 flex-shrink-0 mt-0.5" />
-                          <p className="text-orange-300 text-sm leading-snug">{standardResult.doseValidation.message}</p>
+                          <AlertTriangle size={15} className="text-orange-600 flex-shrink-0 mt-0.5" />
+                          <p className="text-orange-700 text-sm leading-snug">{standardResult.doseValidation.message}</p>
                         </div>
                       )}
                       <div className="text-xs space-y-1">
-                        <p className="text-slate-400">
+                        <p className="text-muted-foreground">
                           Concentração-padrão:{' '}
                           <span className={`font-semibold ${colors.text}`}>
                             {standardResult.concentrationUsed.value} {standardResult.concentrationUsed.unit}
                           </span>
                         </p>
-                        <p className="text-slate-600 font-mono break-all">{standardResult.formulaUsed}</p>
+                        <p className="text-muted-foreground font-mono break-all">{standardResult.formulaUsed}</p>
                       </div>
                       {standardResult.source && (
-                        <p className="text-[11px] text-slate-600 leading-snug">Fonte: {standardResult.source}</p>
+                        <p className="text-[11px] text-muted-foreground leading-snug">Fonte: {standardResult.source}</p>
                       )}
                     </div>
                     <PrescriptionBox
@@ -338,19 +338,19 @@ export default function DrugCalculator() {
                     />
                   </div>
                 ) : (
-                  <div className="rounded-xl border border-slate-700 bg-slate-800/30 p-4">
+                  <div className="rounded-xl border border-border bg-card/30 p-4">
                     <div className="flex items-center gap-2 mb-2">
-                      <Info size={15} className="text-slate-400 flex-shrink-0" />
-                      <span className="text-slate-400 font-semibold text-sm uppercase tracking-wide">
+                      <Info size={15} className="text-muted-foreground flex-shrink-0" />
+                      <span className="text-muted-foreground font-semibold text-sm uppercase tracking-wide">
                         Protocolo Padrão indisponível
                       </span>
                     </div>
-                    <p className="text-sm text-slate-400 leading-snug">{standardResult.reason}</p>
+                    <p className="text-sm text-muted-foreground leading-snug">{standardResult.reason}</p>
                   </div>
                 )
               ) : (
-                <div className="rounded-xl border border-slate-800 bg-slate-800/30 p-8 text-center">
-                  <p className="text-slate-500 text-sm">Informe o peso e a dose para calcular</p>
+                <div className="rounded-xl border border-border bg-card/30 p-8 text-center">
+                  <p className="text-muted-foreground text-sm">Informe o peso e a dose para calcular</p>
                 </div>
               )
             ) : result ? (
@@ -361,21 +361,21 @@ export default function DrugCalculator() {
                 return (
                   <div className="rounded-xl border border-orange-500/40 bg-orange-500/10 p-4 space-y-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <AlertTriangle size={15} className="text-orange-400 flex-shrink-0" />
-                      <span className="text-orange-400 font-semibold text-sm uppercase tracking-wide">Volume insuficiente</span>
+                      <AlertTriangle size={15} className="text-orange-600 flex-shrink-0" />
+                      <span className="text-orange-600 font-semibold text-sm uppercase tracking-wide">Volume insuficiente</span>
                     </div>
-                    <p className="text-orange-200 text-sm leading-snug">
+                    <p className="text-orange-700 text-sm leading-snug">
                       O volume do fármaco ({result.drugVolumeMl} ml) excede o volume total de preparo ({totalVolume} ml).
                     </p>
                     {suggestedVol ? (
-                      <p className="text-orange-300 text-sm font-semibold mt-1">
+                      <p className="text-orange-700 text-sm font-semibold mt-1">
                         → Use o volume de preparo de <button
                           onClick={() => setTotalVolume(suggestedVol.value)}
-                          className="underline underline-offset-2 hover:text-orange-100 transition-colors"
+                          className="underline underline-offset-2 hover:text-orange-800 transition-colors"
                         >{suggestedVol.label} ({suggestedVol.rate})</button> ou superior.
                       </p>
                     ) : (
-                      <p className="text-orange-300 text-sm font-semibold mt-1">
+                      <p className="text-orange-700 text-sm font-semibold mt-1">
                         → Considere reduzir a dose ou aumentar o volume de preparo além de {VOLUME_OPTIONS[VOLUME_OPTIONS.length - 1].label}.
                       </p>
                     )}
@@ -383,26 +383,26 @@ export default function DrugCalculator() {
                 );
               })()}
 
-              <div className="rounded-xl border border-slate-700 bg-slate-800/50 overflow-hidden">
+              <div className="rounded-xl border border-border bg-card/50 overflow-hidden">
                 {/* Números resumo */}
-                <div className="grid grid-cols-3 divide-x divide-slate-700 border-b border-slate-700">
+                <div className="grid grid-cols-3 divide-x divide-border border-b border-border">
                   <div className="p-4 text-center">
                     <div className={`text-2xl font-bold ${colors.text}`}>
                       {result.drugVolumeMl}
                     </div>
-                    <div className="text-xs text-slate-500 mt-1">ml do fármaco</div>
+                    <div className="text-xs text-muted-foreground mt-1">ml do fármaco</div>
                   </div>
                   <div className="p-4 text-center">
-                    <div className={`text-2xl font-bold ${result.diluentVolumeMl < 0 ? 'text-orange-400' : 'text-slate-300'}`}>
+                    <div className={`text-2xl font-bold ${result.diluentVolumeMl < 0 ? 'text-orange-600' : 'text-muted-foreground'}`}>
                       {result.diluentVolumeMl}
                     </div>
-                    <div className="text-xs text-slate-500 mt-1">ml de {drug.diluent}</div>
+                    <div className="text-xs text-muted-foreground mt-1">ml de {drug.diluent}</div>
                   </div>
                   <div className="p-4 text-center">
-                    <div className="text-2xl font-bold text-slate-100">
+                    <div className="text-2xl font-bold text-foreground">
                       {result.infusionRateMlH}
                     </div>
-                    <div className="text-xs text-slate-500 mt-1">ml/h (BIC)</div>
+                    <div className="text-xs text-muted-foreground mt-1">ml/h (BIC)</div>
                   </div>
                 </div>
 
@@ -415,13 +415,13 @@ export default function DrugCalculator() {
               </div>
               </>
             ) : (
-              <div className="rounded-xl border border-slate-800 bg-slate-800/30 p-8 text-center">
-                <p className="text-slate-500 text-sm">Informe o peso e a dose para calcular</p>
+              <div className="rounded-xl border border-border bg-card/30 p-8 text-center">
+                <p className="text-muted-foreground text-sm">Informe o peso e a dose para calcular</p>
               </div>
             )}
 
             {/* Nota de cálculo */}
-            <div className="flex items-start gap-2 text-xs text-slate-600">
+            <div className="flex items-start gap-2 text-xs text-muted-foreground">
               <Info size={12} className="flex-shrink-0 mt-0.5" />
               <span>{drug.calcNote}</span>
             </div>
@@ -430,11 +430,11 @@ export default function DrugCalculator() {
             {criticalAlerts.length > 0 && (
               <div className="rounded-xl border border-red-500/40 bg-red-500/10 p-4 space-y-1">
                 <div className="flex items-center gap-2 mb-2">
-                  <AlertTriangle size={16} className="text-red-400 flex-shrink-0" />
-                  <span className="text-red-400 font-semibold text-sm uppercase tracking-wide">Atenção</span>
+                  <AlertTriangle size={16} className="text-red-600 flex-shrink-0" />
+                  <span className="text-red-600 font-semibold text-sm uppercase tracking-wide">Atenção</span>
                 </div>
                 {criticalAlerts.map((code) => (
-                  <p key={code} className="text-red-300 text-sm leading-snug">
+                  <p key={code} className="text-red-700 text-sm leading-snug">
                     {ALERT_MESSAGES[code]?.message || code}
                   </p>
                 ))}
@@ -446,18 +446,18 @@ export default function DrugCalculator() {
         {activeTab === 'info' && (
           <div className="space-y-4">
             <InfoSection title="Apresentação" icon="💊">
-              <p className="text-slate-300 text-sm">{drug.presentation}</p>
+              <p className="text-muted-foreground text-sm">{drug.presentation}</p>
             </InfoSection>
             <InfoSection title="Classe Terapêutica" icon="🏷️">
-              <p className="text-slate-300 text-sm">{drug.therapeuticClass}</p>
+              <p className="text-muted-foreground text-sm">{drug.therapeuticClass}</p>
             </InfoSection>
             <InfoSection title="Mecanismo de Ação" icon="⚡">
-              <p className="text-slate-300 text-sm leading-relaxed">{drug.mechanism}</p>
+              <p className="text-muted-foreground text-sm leading-relaxed">{drug.mechanism}</p>
             </InfoSection>
             <InfoSection title="Indicações" icon="✅">
               <ul className="space-y-1">
                 {drug.indications.map((ind, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-slate-300">
+                  <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                     <span className={`mt-1 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current ${colors.text}`} />
                     {ind}
                   </li>
@@ -470,7 +470,7 @@ export default function DrugCalculator() {
                   {drug.doseTips.map((tip, i) => (
                     <div key={i} className="flex flex-col gap-0.5">
                       <span className={`text-sm font-semibold font-mono ${colors.text}`}>{tip.range}</span>
-                      <span className="text-sm text-slate-400">{tip.effect}</span>
+                      <span className="text-sm text-muted-foreground">{tip.effect}</span>
                     </div>
                   ))}
                 </div>
@@ -479,7 +479,7 @@ export default function DrugCalculator() {
             <InfoSection title="Efeitos Adversos" icon="⚠️">
               <ul className="space-y-1">
                 {drug.adverseEffects.map((ef, i) => (
-                  <li key={i} className="text-sm text-slate-300 flex items-start gap-2">
+                  <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
                     <span className="text-amber-500 mt-0.5">•</span> {ef}
                   </li>
                 ))}
@@ -488,8 +488,8 @@ export default function DrugCalculator() {
             <InfoSection title="Considerações Especiais" icon="📋">
               <ul className="space-y-1">
                 {drug.specialConsiderations.map((c, i) => (
-                  <li key={i} className="text-sm text-slate-300 flex items-start gap-2">
-                    <span className="text-slate-500 mt-0.5">→</span> {c}
+                  <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
+                    <span className="text-muted-foreground mt-0.5">→</span> {c}
                   </li>
                 ))}
               </ul>
@@ -499,8 +499,8 @@ export default function DrugCalculator() {
               <InfoSection title="Alertas Clínicos" icon="🔔">
                 <ul className="space-y-1">
                   {nonCriticalAlerts.map((code) => (
-                    <li key={code} className="text-sm text-slate-300 flex items-start gap-2">
-                      <span className="text-slate-500 mt-0.5">•</span> {ALERT_MESSAGES[code]?.message || code}
+                    <li key={code} className="text-sm text-muted-foreground flex items-start gap-2">
+                      <span className="text-muted-foreground mt-0.5">•</span> {ALERT_MESSAGES[code]?.message || code}
                     </li>
                   ))}
                 </ul>
@@ -509,9 +509,9 @@ export default function DrugCalculator() {
 
             {drug.standardProtocol && (
               <InfoSection title="Protocolo Padrão — Fontes e Metodologia" icon="📚">
-                <p className="text-sm text-slate-300 leading-relaxed">{drug.standardProtocol.notes}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">{drug.standardProtocol.notes}</p>
                 {drug.standardProtocol.source && (
-                  <p className="text-xs text-slate-600 mt-2">Fonte: {drug.standardProtocol.source}</p>
+                  <p className="text-xs text-muted-foreground mt-2">Fonte: {drug.standardProtocol.source}</p>
                 )}
               </InfoSection>
             )}
@@ -521,12 +521,12 @@ export default function DrugCalculator() {
                 <div className="space-y-3">
                   {drug.referenceOnly.map((ref, i) => (
                     <div key={i} className="space-y-1">
-                      <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                         {ref.sourceType}
                       </p>
-                      <p className="text-sm text-slate-300 leading-relaxed">{ref.notes}</p>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{ref.notes}</p>
                       {ref.source && (
-                        <p className="text-xs text-slate-600">{ref.source}</p>
+                        <p className="text-xs text-muted-foreground">{ref.source}</p>
                       )}
                     </div>
                   ))}
@@ -535,7 +535,7 @@ export default function DrugCalculator() {
             )}
 
             {drug.references?.length > 0 && (
-              <p className="text-xs text-slate-600 px-1">
+              <p className="text-xs text-muted-foreground px-1">
                 Fonte: {drug.references.map((id) => getReferenceTitle(id)).join(', ')}
               </p>
             )}
@@ -548,10 +548,10 @@ export default function DrugCalculator() {
 
 function InfoSection({ title, icon, children }) {
   return (
-    <div className="rounded-xl border border-slate-800 bg-slate-800/40 p-4 space-y-3">
+    <div className="rounded-xl border border-border bg-card/40 p-4 space-y-3">
       <div className="flex items-center gap-2">
         <span>{icon}</span>
-        <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wide">{title}</h3>
+        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{title}</h3>
       </div>
       {children}
     </div>

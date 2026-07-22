@@ -39,7 +39,7 @@ function ListEditor({ label, items, onChange, placeholder }) {
 
   return (
     <div>
-      <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">{label}</label>
+      <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">{label}</label>
       <div className="space-y-1.5">
         {items.map((item, i) => (
           <div key={i} className="flex gap-2">
@@ -47,14 +47,14 @@ function ListEditor({ label, items, onChange, placeholder }) {
               value={item}
               onChange={(e) => update(i, e.target.value)}
               placeholder={placeholder}
-              className="flex-1 bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-slate-500 placeholder:text-slate-600"
+              className="flex-1 bg-background border border-border px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary placeholder:text-muted-foreground"
             />
-            <button onClick={() => remove(i)} className="text-slate-600 hover:text-red-400 px-2">
+            <button onClick={() => remove(i)} className="text-muted-foreground hover:text-red-600 px-2">
               <Trash2 size={14} />
             </button>
           </div>
         ))}
-        <button onClick={add} className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-amber-400 transition-colors mt-1">
+        <button onClick={add} className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-primary transition-colors mt-1">
           <Plus size={12} /> Adicionar
         </button>
       </div>
@@ -73,7 +73,7 @@ function DoseTipsEditor({ tips, onChange }) {
 
   return (
     <div>
-      <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Dose Tips (opcional)</label>
+      <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Dose Tips (opcional)</label>
       <div className="space-y-2">
         {tips.map((tip, i) => (
           <div key={i} className="flex gap-2">
@@ -81,20 +81,20 @@ function DoseTipsEditor({ tips, onChange }) {
               value={tip.range}
               onChange={(e) => update(i, 'range', e.target.value)}
               placeholder="Ex: 5–10 mcg/kg/min"
-              className="flex-1 bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-slate-500 placeholder:text-slate-600"
+              className="flex-1 bg-background border border-border px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary placeholder:text-muted-foreground"
             />
             <input
               value={tip.effect}
               onChange={(e) => update(i, 'effect', e.target.value)}
               placeholder="Efeito esperado"
-              className="flex-1 bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-slate-500 placeholder:text-slate-600"
+              className="flex-1 bg-background border border-border px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary placeholder:text-muted-foreground"
             />
-            <button onClick={() => remove(i)} className="text-slate-600 hover:text-red-400 px-2">
+            <button onClick={() => remove(i)} className="text-muted-foreground hover:text-red-600 px-2">
               <Trash2 size={14} />
             </button>
           </div>
         ))}
-        <button onClick={add} className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-amber-400 transition-colors">
+        <button onClick={add} className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-primary transition-colors">
           <Plus size={12} /> Adicionar faixa de dose
         </button>
       </div>
@@ -105,7 +105,7 @@ function DoseTipsEditor({ tips, onChange }) {
 function Field({ label, children }) {
   return (
     <div>
-      <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">{label}</label>
+      <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">{label}</label>
       {children}
     </div>
   );
@@ -121,7 +121,7 @@ function Input({ value, onChange, type = 'text', placeholder, step, min, max }) 
       step={step}
       min={min}
       max={max}
-      className="w-full bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-slate-500 placeholder:text-slate-600 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+      className="w-full bg-background border border-border px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary placeholder:text-muted-foreground [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
     />
   );
 }
@@ -131,7 +131,7 @@ function Select({ value, onChange, options }) {
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-slate-500"
+      className="w-full bg-background border border-border px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary"
     >
       {options.map((o) => (
         <option key={o.value} value={o.value}>{o.label}</option>
@@ -164,15 +164,15 @@ export default function DrugForm({ initial, onSave, onCancel }) {
   const isEdit = !!initial;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 overflow-y-auto">
+    <div className="fixed inset-0 z-50 bg-black/50 overflow-y-auto">
       <div className="min-h-screen flex items-start justify-center py-8 px-4">
-        <div className="w-full max-w-2xl bg-slate-800 border border-slate-700">
+        <div className="w-full max-w-2xl bg-card border border-border">
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-border">
             <h2 className="font-bold text-slate-100 text-base">
               {isEdit ? `Editando: ${initial.name}` : 'Novo Medicamento'}
             </h2>
-            <button onClick={onCancel} className="text-slate-500 hover:text-slate-200">
+            <button onClick={onCancel} className="text-slate-500 hover:text-foreground">
               <X size={18} />
             </button>
           </div>
@@ -207,13 +207,13 @@ export default function DrugForm({ initial, onSave, onCancel }) {
                 onChange={(e) => set('mechanism', e.target.value)}
                 rows={3}
                 placeholder="Descreva o mecanismo de ação..."
-                className="w-full bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-slate-500 placeholder:text-slate-600 resize-none"
+                className="w-full bg-background border border-border px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary placeholder:text-muted-foreground resize-none"
               />
             </Field>
 
             {/* Dose */}
-            <div className="border border-slate-700 p-4 space-y-4">
-              <p className="text-xs font-bold text-amber-400 uppercase tracking-wider">Dose</p>
+            <div className="border border-border p-4 space-y-4">
+              <p className="text-xs font-bold text-primary uppercase tracking-wider">Dose</p>
               <div className="grid grid-cols-2 gap-4">
                 <Field label="Unidade de Dose">
                   <Input value={form.doseUnit} onChange={(v) => set('doseUnit', v)} placeholder="mcg/kg/min" />
@@ -237,8 +237,8 @@ export default function DrugForm({ initial, onSave, onCancel }) {
             </div>
 
             {/* Fórmula de cálculo */}
-            <div className="border border-slate-700 p-4 space-y-4">
-              <p className="text-xs font-bold text-indigo-400 uppercase tracking-wider">Fórmula de Cálculo</p>
+            <div className="border border-border p-4 space-y-4">
+              <p className="text-xs font-bold text-indigo-600 uppercase tracking-wider">Fórmula de Cálculo</p>
               <div className="grid grid-cols-2 gap-4">
                 <Field label="Algoritmo">
                   <Select
@@ -271,7 +271,7 @@ export default function DrugForm({ initial, onSave, onCancel }) {
             <Field label="Alertas Críticos">
               <div className="space-y-1.5">
                 {Object.values(ALERTS).map((alert) => (
-                  <label key={alert.id} className="flex items-center gap-2 text-sm text-slate-300">
+                  <label key={alert.id} className="flex items-center gap-2 text-sm text-muted-foreground">
                     <input
                       type="checkbox"
                       checked={form.alerts.includes(alert.id)}
@@ -290,11 +290,11 @@ export default function DrugForm({ initial, onSave, onCancel }) {
           </div>
 
           {/* Footer */}
-          <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-700 bg-slate-800/80">
-            <button onClick={onCancel} className="px-4 py-2 text-sm text-slate-400 hover:text-slate-200 border border-slate-700 hover:border-slate-500 transition-colors">
+          <div className="flex justify-end gap-3 px-6 py-4 border-t border-border bg-card/80">
+            <button onClick={onCancel} className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground border border-border hover:border-primary transition-colors">
               Cancelar
             </button>
-            <button onClick={handleSave} className="px-6 py-2 text-sm font-bold bg-amber-500 hover:bg-amber-400 text-slate-900 transition-colors">
+            <button onClick={handleSave} className="px-6 py-2 text-sm font-bold bg-primary hover:bg-primary/90 text-primary-foreground transition-colors">
               {isEdit ? 'Salvar Alterações' : 'Adicionar Medicamento'}
             </button>
           </div>
