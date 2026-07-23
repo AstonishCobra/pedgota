@@ -25,7 +25,7 @@ export const drugs = [
       'Suporte hemodinâmico em casos refratários',
     ],
     doseUnit: 'mcg/kg/min',
-    doseMin: 0.05,
+    doseMin: 0.1,
     doseMax: 1,
     doseStep: 0.01,
     doseDefault: 0.1,
@@ -38,7 +38,6 @@ export const drugs = [
     algorithm: 'VASOACTIVE_STANDARD',
     concentration: { value: 1, unit: 'mg/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
-    references: [],
     calcNote: 'Dose × Peso × 1,44 = ml do fármaco para 24h a 1 ml/h',
     standardProtocol: {
       "type": "standard_concentration",
@@ -83,10 +82,10 @@ export const drugs = [
       'Hipotensão grave em estados de choque com resistência vascular reduzida',
     ],
     doseUnit: 'mcg/kg/min',
-    doseMin: 0.05,
+    doseMin: 0.2,
     doseMax: 2,
     doseStep: 0.01,
-    doseDefault: 0.1,
+    doseDefault: 0.2,
     adverseEffects: ['Hipertensão', 'Isquemia periférica', 'Taquicardia, arritmias (efeito β1 leve)'],
     specialConsiderations: [
       'Preferência por acesso venoso central',
@@ -97,7 +96,6 @@ export const drugs = [
     algorithm: 'VASOACTIVE_STANDARD',
     concentration: { value: 1, unit: 'mg/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
-    references: [],
     calcNote: 'Dose × Peso × 1,44 = ml do fármaco para 24h a 1 ml/h',
     standardProtocol: {
       "type": "standard_concentration",
@@ -152,7 +150,6 @@ export const drugs = [
     algorithm: 'VASOACTIVE_STANDARD',
     concentration: { value: 5, unit: 'mg/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
-    references: [],
     calcNote: 'Dose × Peso × 1,44 = mg → ÷ 5 (mg/ml) = ml do fármaco',
     standardProtocol: {
       "type": "standard_concentration",
@@ -190,8 +187,8 @@ export const drugs = [
       'Situações que requerem aumento da contratilidade com redução da pós-carga',
     ],
     doseUnit: 'mcg/kg/min',
-    doseMin: 5,
-    doseMax: 20,
+    doseMin: 2,
+    doseMax: 25,
     doseStep: 0.5,
     doseDefault: 10,
     adverseEffects: ['Taquicardia', 'Arritmias', 'Hipotensão (efeito vasodilatador)', 'Dor torácica em pacientes suscetíveis'],
@@ -204,7 +201,6 @@ export const drugs = [
     algorithm: 'VASOACTIVE_STANDARD',
     concentration: { value: 12.5, unit: 'mg/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
-    references: [],
     calcNote: 'Dose × Peso × 1,44 = mg → ÷ 12,5 (mg/ml) = ml do fármaco',
     standardProtocol: {
       "type": "standard_concentration",
@@ -256,7 +252,6 @@ export const drugs = [
     algorithm: 'VASOPRESSIN',
     concentration: { value: 20, unit: 'UI/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 50 },
-    references: [],
     // Diluição padrão: 1ml (20UI) + 49ml SF = 50ml → concentração 0,4 UI/ml
     calcNote: 'Dose × Peso × 24 = UI totais → ÷ 0,4 (UI/ml) = volume para 24h → velocidade em ml/h',
     referenceOnly: [
@@ -295,8 +290,8 @@ export const drugs = [
       'Hipertensão pulmonar',
     ],
     doseUnit: 'mcg/kg/min',
-    doseMin: 0.1,
-    doseMax: 1,
+    doseMin: 0.25,
+    doseMax: 0.75,
     doseStep: 0.05,
     doseDefault: 0.5,
     adverseEffects: ['Hipotensão (efeito vasodilatador)', 'Arritmias ventriculares ou supraventriculares', 'Trombocitopenia (menos comum)'],
@@ -309,7 +304,6 @@ export const drugs = [
     algorithm: 'VASOACTIVE_STANDARD',
     concentration: { value: 1, unit: 'mg/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
-    references: [],
     calcNote: 'Dose × Peso × 1,44 = ml do fármaco para 24h a 1 ml/h',
     standardProtocol: {
       "type": "standard_concentration",
@@ -370,7 +364,6 @@ export const drugs = [
     algorithm: 'VASOACTIVE_STANDARD',
     concentration: { value: 25, unit: 'mg/ml' },
     preparation: { diluent: 'SG 5%', finalVolume: 24 },
-    references: [],
     calcNote: 'Dose × Peso × 1,44 = mg → ÷ 25 (mg/ml) = ml do fármaco. Diluente: SG 5%',
     referenceOnly: [
       {
@@ -423,7 +416,6 @@ export const drugs = [
     algorithm: 'SEDATION_STANDARD',
     concentration: { value: 50, unit: 'mcg/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
-    references: [],
     calcNote: 'Dose × Peso × 24 = mcg totais → ÷ 50 (mcg/ml) = ml do fármaco',
     standardProtocol: {
       "type": "standard_concentration",
@@ -464,15 +456,10 @@ export const drugs = [
       'Controle de agitação em pacientes graves',
     ],
     doseUnit: 'mg/kg/h',
-    doseMin: 0.06,
-    doseMax: 0.6,
+    doseMin: 0.01,
+    doseMax: 0.12,
     doseStep: 0.01,
     doseDefault: 0.1,
-    doseTips: [
-      { range: '0,06–0,1 mg/kg/h', effect: 'Sedação leve' },
-      { range: '0,1–0,3 mg/kg/h', effect: 'Sedação moderada' },
-      { range: '0,3–0,6 mg/kg/h', effect: 'Sedação profunda (máx 15 mg/h)' },
-    ],
     adverseEffects: ['Depressão respiratória', 'Hipotensão', 'Bradicardia', 'Sedação excessiva'],
     specialConsiderations: [
       'Monitorar continuamente nível de sedação, oximetria e sinais vitais',
@@ -482,7 +469,6 @@ export const drugs = [
     algorithm: 'SEDATION_STANDARD',
     concentration: { value: 5, unit: 'mg/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
-    references: [],
     calcNote: 'Dose × Peso × 24 = mg → ÷ 5 (mg/ml) = ml do fármaco',
     standardProtocol: {
       "type": "standard_concentration",
@@ -524,15 +510,10 @@ export const drugs = [
       'Sedação e analgesia em dor intensa ou trauma',
     ],
     doseUnit: 'mcg/kg/min',
-    doseMin: 10,
-    doseMax: 60,
+    doseMin: 5,
+    doseMax: 20,
     doseStep: 1,
     doseDefault: 20,
-    doseTips: [
-      { range: '10–20 mcg/kg/min', effect: 'Analgesia e sedação leve' },
-      { range: '20–40 mcg/kg/min', effect: 'Sedação + efeito broncodilatador' },
-      { range: '40–60 mcg/kg/min', effect: 'Sedação profunda' },
-    ],
     adverseEffects: ['Aumento de PA e FC', 'Hipersalivação', 'Alucinações ou agitação (especialmente no despertar)', 'Náuseas e vômitos'],
     specialConsiderations: [
       'Excelente opção em instabilidade hemodinâmica',
@@ -543,7 +524,6 @@ export const drugs = [
     algorithm: 'VASOACTIVE_STANDARD',
     concentration: { value: 50, unit: 'mg/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
-    references: [],
     calcNote: 'Dose × Peso × 1,44 = mg → ÷ 50 (mg/ml) = ml do fármaco',
     standardProtocol: {
       "type": "standard_concentration",
@@ -570,14 +550,9 @@ export const drugs = [
     ],
     doseUnit: 'mcg/kg/h',
     doseMin: 0.2,
-    doseMax: 1,
+    doseMax: 0.5,
     doseStep: 0.1,
     doseDefault: 0.4,
-    doseTips: [
-      { range: '0,2 mcg/kg/h', effect: 'Dose inicial' },
-      { range: '0,2–0,7 mcg/kg/h', effect: 'Faixa habitual de ajuste' },
-      { range: 'até 1 mcg/kg/h', effect: 'Situações específicas' },
-    ],
     adverseEffects: ['Bradicardia', 'Hipotensão (especialmente em doses altas ou infusão rápida)', 'Boca seca', 'Náuseas (menos comum)'],
     specialConsiderations: [
       '⚠ Evitar dose de ataque em crianças (risco de bradicardia e hipotensão)',
@@ -589,7 +564,6 @@ export const drugs = [
     algorithm: 'DEXMEDETOMIDINE',
     concentration: { value: 100, unit: 'mcg/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 50 },
-    references: [],
     // Diluição padrão fixa: 2ml (200mcg) + 48ml SF = 50ml → 4 mcg/ml
     calcNote: 'Diluição padrão: 2 ml (200 mcg) + 48 ml SF 0,9% = 50 ml (4 mcg/ml). Velocidade = Dose × Peso ÷ 4 = ml/h',
     standardProtocol: {
@@ -617,7 +591,7 @@ export const drugs = [
       'Manutenção de bloqueio neuromuscular em ventilação mecânica (sempre com sedação e analgesia)',
     ],
     doseUnit: 'mcg/kg/min',
-    doseMin: 5,
+    doseMin: 7,
     doseMax: 12,
     doseStep: 0.5,
     doseDefault: 7,
@@ -631,7 +605,6 @@ export const drugs = [
     algorithm: 'VASOACTIVE_STANDARD',
     concentration: { value: 10, unit: 'mg/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
-    references: [],
     calcNote: 'Dose × Peso × 1,44 = mg → ÷ 10 (mg/ml) = ml do fármaco',
     standardProtocol: {
       "type": "standard_concentration",
@@ -747,19 +720,19 @@ export function calculateDrug(drug, weightKg, dose, totalVolumeMl = 24) {
 }
 
 export const vasoactiveComparativeData = [
-  { name: 'Adrenalina', presentation: '1 mg/ml', mechanism: 'Agonista α e β. Dose-dependente: β em baixas, α em altas', dose: '0,05–1 mcg/kg/min', indications: 'Parada cardíaca, choque séptico, anafilaxia, edema de glote', adverseEffects: 'Arritmias, hipertensão, isquemia miocárdica' },
-  { name: 'Noradrenalina', presentation: '1 mg/ml', mechanism: 'Agonista α1 (vasoconstrição), β1 discreto', dose: '0,05–2 mcg/kg/min', indications: 'Choque séptico, distributivo, hipotensão refratária', adverseEffects: 'Isquemia periférica, hipertensão, arritmias' },
+  { name: 'Adrenalina', presentation: '1 mg/ml', mechanism: 'Agonista α e β. Dose-dependente: β em baixas, α em altas', dose: '0,1–1 mcg/kg/min', indications: 'Parada cardíaca, choque séptico, anafilaxia, edema de glote', adverseEffects: 'Arritmias, hipertensão, isquemia miocárdica' },
+  { name: 'Noradrenalina', presentation: '1 mg/ml', mechanism: 'Agonista α1 (vasoconstrição), β1 discreto', dose: '0,2–2 mcg/kg/min', indications: 'Choque séptico, distributivo, hipotensão refratária', adverseEffects: 'Isquemia periférica, hipertensão, arritmias' },
   { name: 'Dopamina', presentation: '5 mg/ml', mechanism: 'Dose-dependente: D1 (renal) → β1 (inotrópico) → α1 (vasoconstrição)', dose: '2–20 mcg/kg/min', indications: 'Choque séptico, cardiogênico, suporte inotrópico', adverseEffects: 'Taquicardia, arritmias, náuseas, vasoconstrição excessiva' },
-  { name: 'Dobutamina', presentation: '12,5 mg/ml', mechanism: 'Agonista β1 (inotrópico) com leve β2 (vasodilatação)', dose: '5–20 mcg/kg/min', indications: 'Choque cardiogênico, disfunção miocárdica em sepse, IC baixo débito', adverseEffects: 'Hipotensão, arritmias, taquicardia' },
+  { name: 'Dobutamina', presentation: '12,5 mg/ml', mechanism: 'Agonista β1 (inotrópico) com leve β2 (vasodilatação)', dose: '2–25 mcg/kg/min', indications: 'Choque cardiogênico, disfunção miocárdica em sepse, IC baixo débito', adverseEffects: 'Hipotensão, arritmias, taquicardia' },
   { name: 'Vasopressina', presentation: '20 UI/ml', mechanism: 'Agonista V1 (vasoconstrição) e V2 (reabsorção de água)', dose: '0,01–0,6 UI/kg/h', indications: 'Choque refratário à noradrenalina, anafilaxia grave, pós-cirúrgico', adverseEffects: 'Isquemia, bradicardia, hiponatremia' },
-  { name: 'Milrinona', presentation: '1 mg/ml', mechanism: 'Inibe fosfodiesterase III (↑AMPc), inotrópico + vasodilatador', dose: '0,1–1 mcg/kg/min', indications: 'Choque cardiogênico, hipertensão pulmonar, disfunção ventricular', adverseEffects: 'Hipotensão, arritmias, trombocitopenia' },
+  { name: 'Milrinona', presentation: '1 mg/ml', mechanism: 'Inibe fosfodiesterase III (↑AMPc), inotrópico + vasodilatador', dose: '0,25–0,75 mcg/kg/min', indications: 'Choque cardiogênico, hipertensão pulmonar, disfunção ventricular', adverseEffects: 'Hipotensão, arritmias, trombocitopenia' },
   { name: 'Nitroprussiato', presentation: '25 mg/ml', mechanism: 'Libera NO (vasodilatação arterial + venosa), reduz pré e pós-carga', dose: '0,3–10 mcg/kg/min', indications: 'Crise hipertensiva, IC pós-carga elevada, controle hemodinâmico cirúrgico', adverseEffects: 'Hipotensão severa, toxicidade por cianeto, náuseas, confusão' },
 ];
 
 export const sedativeComparativeData = [
   { name: 'Fentanil', presentation: '50 mcg/ml', mechanism: 'Agonista μ-opioide. Analgesia intensa e sedação', dose: '1–5 mcg/kg/h', indications: 'Dor aguda intensa, sedação em VM, procedimentos invasivos', adverseEffects: 'Depressão respiratória, bradicardia, rigidez muscular, constipação' },
-  { name: 'Midazolam', presentation: '5 mg/ml', mechanism: 'Agonista GABA-A. Sedação, amnésia, relaxamento muscular', dose: '0,06–0,6 mg/kg/h', indications: 'Sedação em VM, agitação psicomotora, procedimentos', adverseEffects: 'Depressão respiratória, hipotensão, bradicardia, acúmulo prolongado' },
-  { name: 'Cetamina', presentation: '50 mg/ml', mechanism: 'Antagonista NMDA. Dissociação sensorial e analgesia', dose: '10–60 mcg/kg/min', indications: 'Dor grave, sedação em choque, procedimentos traumáticos', adverseEffects: 'Hipertensão, taquicardia, alucinações, hipersalivação' },
-  { name: 'Dexmedetomidina', presentation: '100 mcg/ml (diluído: 4 mcg/ml)', mechanism: 'Agonista alfa-2. Sedação com mínima depressão respiratória', dose: '0,2–1 mcg/kg/h', indications: 'Sedação leve a moderada em VM, pacientes instáveis hemodinamicamente', adverseEffects: 'Bradicardia, hipotensão, boca seca' },
-  { name: 'Rocurônio', presentation: '10 mg/ml', mechanism: 'Bloqueador neuromuscular (não sedativo/analgésico)', dose: '5–12 mcg/kg/min', indications: 'Paralisia muscular em VM, IOT em sequência rápida', adverseEffects: 'Apneia, paralisia prolongada, bradicardia (raro)' },
+  { name: 'Midazolam', presentation: '5 mg/ml', mechanism: 'Agonista GABA-A. Sedação, amnésia, relaxamento muscular', dose: '0,01–0,12 mg/kg/h', indications: 'Sedação em VM, agitação psicomotora, procedimentos', adverseEffects: 'Depressão respiratória, hipotensão, bradicardia, acúmulo prolongado' },
+  { name: 'Cetamina', presentation: '50 mg/ml', mechanism: 'Antagonista NMDA. Dissociação sensorial e analgesia', dose: '5–20 mcg/kg/min', indications: 'Dor grave, sedação em choque, procedimentos traumáticos', adverseEffects: 'Hipertensão, taquicardia, alucinações, hipersalivação' },
+  { name: 'Dexmedetomidina', presentation: '100 mcg/ml (diluído: 4 mcg/ml)', mechanism: 'Agonista alfa-2. Sedação com mínima depressão respiratória', dose: '0,2–0,5 mcg/kg/h', indications: 'Sedação leve a moderada em VM, pacientes instáveis hemodinamicamente', adverseEffects: 'Bradicardia, hipotensão, boca seca' },
+  { name: 'Rocurônio', presentation: '10 mg/ml', mechanism: 'Bloqueador neuromuscular (não sedativo/analgésico)', dose: '7–12 mcg/kg/min', indications: 'Paralisia muscular em VM, IOT em sequência rápida', adverseEffects: 'Apneia, paralisia prolongada, bradicardia (raro)' },
 ];
