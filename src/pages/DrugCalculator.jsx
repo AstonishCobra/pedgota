@@ -420,10 +420,12 @@ export default function DrugCalculator() {
             )}
 
             {/* Nota de cálculo */}
-            <div className="flex items-start gap-2 text-xs text-muted-foreground">
-              <Info size={12} className="flex-shrink-0 mt-0.5" />
-              <span>{drug.calcNote}</span>
-            </div>
+            {protocolMode === 'guia' && (
+              <div className="flex items-start gap-2 text-xs text-muted-foreground">
+                <Info size={12} className="flex-shrink-0 mt-0.5" />
+                <span>{drug.calcNote}</span>
+              </div>
+            )}
 
             {/* Alertas críticos (tarja preta / risco de vida) */}
             {criticalAlerts.length > 0 && (
