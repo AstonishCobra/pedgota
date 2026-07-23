@@ -188,7 +188,7 @@ const ALERT_MESSAGES = {
   },
   label_confusion_hemitartarato_vs_base: {
     severity: "critical",
-    message: "Atenção ao rótulo do fabricante: dose pode estar expressa em hemitartarato, não em base — sempre calcular pela base.",
+    message: "Rótulo do frasco pode indicar a massa do SAL (hemitartarato), não da BASE ativa — ex.: '8mg/4mL' no rótulo equivale a apenas 4mg/4mL (1mg/mL) de noradrenalina base. Este app calcula sempre pela base (1mg/mL). Confirme a concentração real do frasco antes de preparar: usar o valor do rótulo sem converter causa erro de até 2x na dose (sub ou superdosagem).",
   },
 
   // ---- Dose / protocolo -----------------------------------------------------
