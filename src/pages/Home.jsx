@@ -4,9 +4,7 @@ import { Activity, ChevronRight, Table2, X, Settings } from 'lucide-react';
 import { getDrugs } from '@/lib/drugStore';
 const drugs = getDrugs();
 import { MODULE_REGISTRY, MODULE_TYPES, PALETTES } from '@/modules/registry';
-import { isAdminSession } from '@/lib/drugStore';
 import InfusionModuleCard from '@/components/home/InfusionModuleCard';
-import SoonModuleCard from '@/components/home/SoonModuleCard';
 
 // Busca rápida por drogas de infusão contínua
 function SearchResults({ search }) {
@@ -73,10 +71,8 @@ export default function Home() {
   const [search, setSearch] = useState('');
   const isSearching = search.trim().length > 0;
 
-  const isAdmin = isAdminSession();
   const visibleModules = MODULE_REGISTRY.filter((m) => m.status !== 'hidden');
   const activeModules = visibleModules.filter((m) => m.status === 'active');
-  const soonModules = isAdmin ? visibleModules.filter((m) => m.status === 'soon') : [];
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -148,17 +144,6 @@ export default function Home() {
               <ChevronRight size={16} className="text-muted-foreground flex-shrink-0" />
             </Link>
 
-            {/* Módulos em breve */}
-            {soonModules.length > 0 &&
-          <div className="space-y-2 pt-2">
-                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">
-                  Próximos módulos
-                </p>
-                {soonModules.map((module) =>
-            <SoonModuleCard key={module.id} module={module} />
-            )}
-              </div>
-          }
           </>
         }
         {/* Link discreto para painel admin */}
