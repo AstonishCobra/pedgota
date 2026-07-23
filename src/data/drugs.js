@@ -38,7 +38,7 @@ export const drugs = [
     algorithm: 'VASOACTIVE_STANDARD',
     concentration: { value: 1, unit: 'mg/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
-    references: ['guide2026'],
+    references: [],
     calcNote: 'Dose × Peso × 1,44 = ml do fármaco para 24h a 1 ml/h',
     standardProtocol: {
       "type": "standard_concentration",
@@ -97,7 +97,7 @@ export const drugs = [
     algorithm: 'VASOACTIVE_STANDARD',
     concentration: { value: 1, unit: 'mg/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
-    references: ['guide2026'],
+    references: [],
     calcNote: 'Dose × Peso × 1,44 = ml do fármaco para 24h a 1 ml/h',
     standardProtocol: {
       "type": "standard_concentration",
@@ -152,7 +152,7 @@ export const drugs = [
     algorithm: 'VASOACTIVE_STANDARD',
     concentration: { value: 5, unit: 'mg/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
-    references: ['guide2026'],
+    references: [],
     calcNote: 'Dose × Peso × 1,44 = mg → ÷ 5 (mg/ml) = ml do fármaco',
     standardProtocol: {
       "type": "standard_concentration",
@@ -204,7 +204,7 @@ export const drugs = [
     algorithm: 'VASOACTIVE_STANDARD',
     concentration: { value: 12.5, unit: 'mg/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
-    references: ['guide2026'],
+    references: [],
     calcNote: 'Dose × Peso × 1,44 = mg → ÷ 12,5 (mg/ml) = ml do fármaco',
     standardProtocol: {
       "type": "standard_concentration",
@@ -256,7 +256,7 @@ export const drugs = [
     algorithm: 'VASOPRESSIN',
     concentration: { value: 20, unit: 'UI/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 50 },
-    references: ['guide2026'],
+    references: [],
     // Diluição padrão: 1ml (20UI) + 49ml SF = 50ml → concentração 0,4 UI/ml
     calcNote: 'Dose × Peso × 24 = UI totais → ÷ 0,4 (UI/ml) = volume para 24h → velocidade em ml/h',
     referenceOnly: [
@@ -309,7 +309,7 @@ export const drugs = [
     algorithm: 'VASOACTIVE_STANDARD',
     concentration: { value: 1, unit: 'mg/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
-    references: ['guide2026'],
+    references: [],
     calcNote: 'Dose × Peso × 1,44 = ml do fármaco para 24h a 1 ml/h',
     standardProtocol: {
       "type": "standard_concentration",
@@ -370,7 +370,7 @@ export const drugs = [
     algorithm: 'VASOACTIVE_STANDARD',
     concentration: { value: 25, unit: 'mg/ml' },
     preparation: { diluent: 'SG 5%', finalVolume: 24 },
-    references: ['guide2026'],
+    references: [],
     calcNote: 'Dose × Peso × 1,44 = mg → ÷ 25 (mg/ml) = ml do fármaco. Diluente: SG 5%',
     referenceOnly: [
       {
@@ -423,7 +423,7 @@ export const drugs = [
     algorithm: 'SEDATION_STANDARD',
     concentration: { value: 50, unit: 'mcg/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
-    references: ['guide2026'],
+    references: [],
     calcNote: 'Dose × Peso × 24 = mcg totais → ÷ 50 (mcg/ml) = ml do fármaco',
     standardProtocol: {
       "type": "standard_concentration",
@@ -482,7 +482,7 @@ export const drugs = [
     algorithm: 'SEDATION_STANDARD',
     concentration: { value: 5, unit: 'mg/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
-    references: ['guide2026'],
+    references: [],
     calcNote: 'Dose × Peso × 24 = mg → ÷ 5 (mg/ml) = ml do fármaco',
     standardProtocol: {
       "type": "standard_concentration",
@@ -543,7 +543,7 @@ export const drugs = [
     algorithm: 'VASOACTIVE_STANDARD',
     concentration: { value: 50, unit: 'mg/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
-    references: ['guide2026'],
+    references: [],
     calcNote: 'Dose × Peso × 1,44 = mg → ÷ 50 (mg/ml) = ml do fármaco',
     standardProtocol: {
       "type": "standard_concentration",
@@ -589,7 +589,7 @@ export const drugs = [
     algorithm: 'DEXMEDETOMIDINE',
     concentration: { value: 100, unit: 'mcg/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 50 },
-    references: ['guide2026'],
+    references: [],
     // Diluição padrão fixa: 2ml (200mcg) + 48ml SF = 50ml → 4 mcg/ml
     calcNote: 'Diluição padrão: 2 ml (200 mcg) + 48 ml SF 0,9% = 50 ml (4 mcg/ml). Velocidade = Dose × Peso ÷ 4 = ml/h',
     standardProtocol: {
@@ -631,7 +631,7 @@ export const drugs = [
     algorithm: 'VASOACTIVE_STANDARD',
     concentration: { value: 10, unit: 'mg/ml' },
     preparation: { diluent: 'SF 0,9%', finalVolume: 24 },
-    references: ['guide2026'],
+    references: [],
     calcNote: 'Dose × Peso × 1,44 = mg → ÷ 10 (mg/ml) = ml do fármaco',
     standardProtocol: {
       "type": "standard_concentration",

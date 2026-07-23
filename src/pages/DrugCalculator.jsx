@@ -5,7 +5,6 @@ import { getDrugs } from '@/lib/drugStore';
 const drugs = getDrugs();
 import { ALERT_MESSAGES } from '@/utils/alertMessages';
 import { calculateStandardProtocol } from '@/utils/standardProtocolCalcEngine';
-import { getReferenceTitle } from '@/data/references';
 import { ChevronLeft, AlertTriangle, Info } from 'lucide-react';
 import PrescriptionBox from '@/components/PrescriptionBox';
 
@@ -534,11 +533,6 @@ export default function DrugCalculator() {
               </InfoSection>
             )}
 
-            {drug.references?.length > 0 && (
-              <p className="text-xs text-muted-foreground px-1">
-                Fonte: {drug.references.map((id) => getReferenceTitle(id)).join(', ')}
-              </p>
-            )}
           </div>
         )}
       </div>
