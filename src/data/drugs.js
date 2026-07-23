@@ -460,6 +460,11 @@ export const drugs = [
     doseMax: 0.12,
     doseStep: 0.01,
     doseDefault: 0.1,
+    doseTips: [
+      { range: '0,03 mg/kg/h', effect: 'Neonatos <32 semanas (HSL, dose fixa)' },
+      { range: '0,06 mg/kg/h', effect: 'Neonatos ≥32 semanas–6 meses (HSL, dose fixa)' },
+      { range: '0,06–0,12 mg/kg/h', effect: '>6 meses (faixa usada no motor de cálculo)' },
+    ],
     adverseEffects: ['Depressão respiratória', 'Hipotensão', 'Bradicardia', 'Sedação excessiva'],
     specialConsiderations: [
       'Monitorar continuamente nível de sedação, oximetria e sinais vitais',
@@ -549,10 +554,14 @@ export const drugs = [
       'Alternativa ao midazolam/fentanil para sedação com vigilância e cooperação',
     ],
     doseUnit: 'mcg/kg/h',
-    doseMin: 0.2,
+    doseMin: 0.1,
     doseMax: 0.5,
     doseStep: 0.1,
     doseDefault: 0.4,
+    doseTips: [
+      { range: '0,1–0,3 mcg/kg/h', effect: 'Neonatos (HSL, manutenção inicial)' },
+      { range: '0,2–0,5 mcg/kg/h', effect: 'Lactentes/crianças/adolescentes (faixa usada no motor de cálculo)' },
+    ],
     adverseEffects: ['Bradicardia', 'Hipotensão (especialmente em doses altas ou infusão rápida)', 'Boca seca', 'Náuseas (menos comum)'],
     specialConsiderations: [
       '⚠ Evitar dose de ataque em crianças (risco de bradicardia e hipotensão)',
@@ -569,9 +578,9 @@ export const drugs = [
     standardProtocol: {
       "type": "standard_concentration",
       "standardConcentration": { "value": 4, "unit": "mcg/ml" },
-      "doseMin": 0.2,
+      "doseMin": 0.1,
       "doseMax": 0.5,
-      "notes": "SEM MONOGRAFIA NEOFAX - dados são do LEXICOMP (fonte real em 'source'). Convergência perfeita de concentração com HSL: receita idêntica (200mcg/2mL em 48mL SF = 4mcg/mL); HSL vende bolsa pronta nessa concentração. Dose (0,2-0,5 mcg/kg/h) é a dose inicial de manutenção, idêntica nas duas fontes. Não incorporadas: faixa mais ampla pós-titulação (0,4-0,7), faixas neonatais, e indicações de procedimento não-invasivo/intranasal.",
+      "notes": "SEM MONOGRAFIA NEOFAX - dados são do LEXICOMP (fonte real em 'source'). Convergência perfeita de concentração com HSL: receita idêntica (200mcg/2mL em 48mL SF = 4mcg/mL); HSL vende bolsa pronta nessa concentração. Dose 0,2-0,5 mcg/kg/h é a dose inicial de manutenção para lactentes/crianças/adolescentes, idêntica nas duas fontes. Piso ampliado para 0,1 mcg/kg/h para acomodar a faixa neonatal do HSL (manutenção inicial 0,1-0,3 mcg/kg/h) - dados neonatais mais limitados que os de lactentes/crianças. Não incorporada: faixa mais ampla pós-titulação (0,4-0,7) e indicações de procedimento não-invasivo/intranasal.",
       "source": "Lexicomp Pediatric/Neonatal, 2021 - Dexmedetomidine Drug Monograph, Dosing (ICU sedation); confirmado por Guia Farmacêutico HSL - DEXMEDETOMIDINA, atualizado 27/01/2026, https://guiafarmaceutico.hsl.org.br/dexmedetomidina"
     },
     alerts: ['no_loading_dose', 'bradycardia_hypotension_sinus_arrest', 'transient_hypertension_loading_dose', 'pediatric_safety_not_formally_established', 'tolerance_withdrawal_prolonged_use'],
@@ -733,6 +742,6 @@ export const sedativeComparativeData = [
   { name: 'Fentanil', presentation: '50 mcg/ml', mechanism: 'Agonista μ-opioide. Analgesia intensa e sedação', dose: '1–5 mcg/kg/h', indications: 'Dor aguda intensa, sedação em VM, procedimentos invasivos', adverseEffects: 'Depressão respiratória, bradicardia, rigidez muscular, constipação' },
   { name: 'Midazolam', presentation: '5 mg/ml', mechanism: 'Agonista GABA-A. Sedação, amnésia, relaxamento muscular', dose: '0,01–0,12 mg/kg/h', indications: 'Sedação em VM, agitação psicomotora, procedimentos', adverseEffects: 'Depressão respiratória, hipotensão, bradicardia, acúmulo prolongado' },
   { name: 'Cetamina', presentation: '50 mg/ml', mechanism: 'Antagonista NMDA. Dissociação sensorial e analgesia', dose: '5–20 mcg/kg/min', indications: 'Dor grave, sedação em choque, procedimentos traumáticos', adverseEffects: 'Hipertensão, taquicardia, alucinações, hipersalivação' },
-  { name: 'Dexmedetomidina', presentation: '100 mcg/ml (diluído: 4 mcg/ml)', mechanism: 'Agonista alfa-2. Sedação com mínima depressão respiratória', dose: '0,2–0,5 mcg/kg/h', indications: 'Sedação leve a moderada em VM, pacientes instáveis hemodinamicamente', adverseEffects: 'Bradicardia, hipotensão, boca seca' },
+  { name: 'Dexmedetomidina', presentation: '100 mcg/ml (diluído: 4 mcg/ml)', mechanism: 'Agonista alfa-2. Sedação com mínima depressão respiratória', dose: '0,1–0,5 mcg/kg/h', indications: 'Sedação leve a moderada em VM, pacientes instáveis hemodinamicamente', adverseEffects: 'Bradicardia, hipotensão, boca seca' },
   { name: 'Rocurônio', presentation: '10 mg/ml', mechanism: 'Bloqueador neuromuscular (não sedativo/analgésico)', dose: '7–12 mcg/kg/min', indications: 'Paralisia muscular em VM, IOT em sequência rápida', adverseEffects: 'Apneia, paralisia prolongada, bradicardia (raro)' },
 ];
