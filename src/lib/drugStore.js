@@ -125,7 +125,6 @@ export function deleteBackup(timestamp) {
 
 // ── Senha ─────────────────────────────────────────────────────────────────────
 const PASS_KEY = 'pedidrip_admin_hash';
-const DEFAULT_PASS = 'pedidrip2024';
 
 function hashPass(pass) {
   // Hash simples deterministico (não criptográfico — apenas para controle de acesso local)
@@ -138,7 +137,7 @@ function hashPass(pass) {
 
 export function checkPassword(pass) {
   const stored = localStorage.getItem(PASS_KEY);
-  if (!stored) return pass === DEFAULT_PASS;
+  if (!stored) return false;
   return hashPass(pass) === stored;
 }
 
