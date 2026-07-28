@@ -78,15 +78,15 @@ export default function Home() {
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
       <div className="max-w-xl mx-auto px-4 pt-10 pb-2">
-        <div className="flex items-center gap-3 mb-6 hidden">
-          
+        
 
-          
-          <div>
-            <h1 className="text-2xl font-bold text-foreground tracking-tight leading-none">in</h1>
-            
-          </div>
-        </div>
+
+
+
+
+
+
+        
 
         {/* Search */}
         <div className="relative">
