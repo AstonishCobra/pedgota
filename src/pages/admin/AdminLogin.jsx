@@ -60,7 +60,6 @@ export default function AdminLogin({ onSuccess }) {
                 </button>
               </div>
               {error && <p className="text-destructive text-xs mt-1.5">{error}</p>}
-              <p className="text-muted-foreground text-xs mt-1.5">Padrão: <span className="font-mono">pedidrip2024</span></p>
             </div>
 
             <button
