@@ -83,7 +83,7 @@ export default function Home() {
 
           
           <div>
-            <h1 className="text-2xl font-bold text-foreground tracking-tight leading-none">Pedgota</h1>
+            <h1 className="text-2xl font-bold text-foreground tracking-tight leading-none">in</h1>
             
           </div>
         </div>
