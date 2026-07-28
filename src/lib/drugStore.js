@@ -123,43 +123,6 @@ export function deleteBackup(timestamp) {
   localStorage.setItem(BACKUP_KEY, JSON.stringify(backups));
 }
 
-// ── Senha ─────────────────────────────────────────────────────────────────────
-const PASS_KEY = 'pedidrip_admin_hash';
-
-function hashPass(pass) {
-  // Hash simples deterministico (não criptográfico — apenas para controle de acesso local)
-  let h = 0;
-  for (let i = 0; i < pass.length; i++) {
-    h = (Math.imul(31, h) + pass.charCodeAt(i)) | 0;
-  }
-  return String(h >>> 0);
-}
-
-export function checkPassword(pass) {
-  const stored = localStorage.getItem(PASS_KEY);
-  if (!stored) return false;
-  return hashPass(pass) === stored;
-}
-
-export function changePassword(newPass) {
-  localStorage.setItem(PASS_KEY, hashPass(newPass));
-}
-
-export function isPasswordSet() {
-  return !!localStorage.getItem(PASS_KEY);
-}
-
-// ── Sessão admin ──────────────────────────────────────────────────────────────
-const SESSION_KEY = 'pedidrip_admin_session';
-
-export function setAdminSession() {
-  sessionStorage.setItem(SESSION_KEY, '1');
-}
-
-export function clearAdminSession() {
-  sessionStorage.removeItem(SESSION_KEY);
-}
-
-export function isAdminSession() {
-  return sessionStorage.getItem(SESSION_KEY) === '1';
-}
+// Observação: o controle de acesso ao painel administrativo foi migrado para o
+// sistema de autenticação do Base44 (papel de usuário "admin"). As funções locais
+// de senha/sessão foram removidas — não há mais credenciais armazenadas no navegador.

@@ -2,13 +2,12 @@ import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ChevronLeft, Plus, Pencil, Trash2, Download, Upload,
-  RotateCcw, Shield, Search, X, KeyRound, AlertTriangle,
+  RotateCcw, LogOut, Search, X, AlertTriangle,
 } from 'lucide-react';
 import { DRUG_CATEGORIES } from '@/data/drugs';
 import {
   getDrugs, addDrug, updateDrug, deleteDrug,
   exportJSON, importJSON, resetToBuiltin,
-  changePassword,
 } from '@/lib/drugStore';
 import DrugForm from './DrugForm';
 import BackupsPanel from './BackupsPanel';
@@ -20,18 +19,15 @@ const CATEGORY_LABELS = {
   [DRUG_CATEGORIES.BNM]: { label: 'BNM', color: 'text-red-600 bg-red-500/10 border-red-500/30' },
 };
 
-const TABS = ['Medicamentos', 'Backups', 'Configurações'];
+const TABS = ['Medicamentos', 'Backups'];
 
-export default function AdminPanel({ onLock }) {
+export default function AdminPanel({ user, onLogout }) {
   const [drugs, setDrugs] = useState(getDrugs);
   const [tab, setTab] = useState('Medicamentos');
   const [search, setSearch] = useState('');
   const [editing, setEditing] = useState(null);  // drug object or 'new'
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [importError, setImportError] = useState('');
-  const [newPass, setNewPass] = useState('');
-  const [newPass2, setNewPass2] = useState('');
-  const [passMsg, setPassMsg] = useState('');
   const fileRef = useRef();
 
   const filtered = drugs.filter((d) =>
@@ -79,16 +75,6 @@ export default function AdminPanel({ onLock }) {
     setDrugs(updated);
   }
 
-  function handleChangePass(e) {
-    e.preventDefault();
-    if (!newPass) return;
-    if (newPass !== newPass2) { setPassMsg('As senhas não coincidem.'); return; }
-    if (newPass.length < 6) { setPassMsg('Mínimo 6 caracteres.'); return; }
-    changePassword(newPass);
-    setNewPass(''); setNewPass2('');
-    setPassMsg('Senha alterada com sucesso!');
-  }
-
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
@@ -99,13 +85,15 @@ export default function AdminPanel({ onLock }) {
           </Link>
           <div className="flex-1">
             <h1 className="text-base font-bold text-foreground">Painel Administrativo</h1>
-            <p className="text-xs text-muted-foreground">{drugs.length} medicamentos cadastrados</p>
+            <p className="text-xs text-muted-foreground">
+              {drugs.length} medicamentos · {user?.email || 'admin'}
+            </p>
           </div>
           <button
-            onClick={onLock}
+            onClick={onLogout}
             className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-muted-foreground border border-border hover:border-primary px-3 py-1.5 transition-colors"
           >
-            <Shield size={13} /> Sair
+            <LogOut size={13} /> Sair
           </button>
         </div>
 
@@ -233,50 +221,6 @@ export default function AdminPanel({ onLock }) {
           <BackupsPanel onRestore={() => setDrugs(getDrugs())} />
         )}
 
-        {/* ── TAB: CONFIGURAÇÕES ── */}
-        {tab === 'Configurações' && (
-          <div className="max-w-sm space-y-6">
-            <div className="border border-border p-5 space-y-4">
-              <div className="flex items-center gap-2">
-                <KeyRound size={16} className="text-primary" />
-                <h3 className="font-bold text-foreground text-sm">Alterar Senha</h3>
-              </div>
-              <form onSubmit={handleChangePass} className="space-y-3">
-                <div>
-                  <label className="block text-xs text-muted-foreground mb-1.5">Nova senha</label>
-                  <input
-                    type="password"
-                    value={newPass}
-                    onChange={(e) => { setNewPass(e.target.value); setPassMsg(''); }}
-                    placeholder="Mínimo 6 caracteres"
-                    className="w-full bg-background border border-border px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary placeholder:text-muted-foreground"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-muted-foreground mb-1.5">Confirmar senha</label>
-                  <input
-                    type="password"
-                    value={newPass2}
-                    onChange={(e) => { setNewPass2(e.target.value); setPassMsg(''); }}
-                    placeholder="Repita a senha"
-                    className="w-full bg-background border border-border px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary placeholder:text-muted-foreground"
-                  />
-                </div>
-                {passMsg && (
-                  <p className={`text-xs ${passMsg.includes('sucesso') ? 'text-emerald-600' : 'text-red-600'}`}>
-                    {passMsg}
-                  </p>
-                )}
-                <button
-                  type="submit"
-                  className="w-full py-2 text-sm font-bold bg-primary hover:bg-primary/90 text-primary-foreground transition-colors"
-                >
-                  Alterar Senha
-                </button>
-              </form>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Modal: Formulário de edição/criação */}
