@@ -243,7 +243,7 @@ export default function AntibioticDetail() {
                 />
               )}
               {doseResult.totalDaily !== null && (
-                <div className="text-xs text-muted-foreground text-center">
+                <div className="text-sm text-muted-foreground text-center">
                   Dose diária total: {round(doseResult.totalDaily)} {indication.doseUnit.includes('UI') ? 'UI' : 'mg'}
                   {' '}({indication.dosesPerDay}x/dia)
                 </div>
