@@ -2,15 +2,26 @@
  * antibiotics.js — dados do módulo Antibióticos
  *
  * Cada droga tem uma ou mais `concentration` (por via: oral/im/ev) e
- * um array `indications` (sempre pelo menos 1 item, cada uma com um
- * campo `route` que diz qual concentração usar pro cálculo de volume).
- * `route` pode ser: 'oral', 'im', 'ev', 'im_ev' (calcula os dois) ou
- * 'fixed' (dose já é fixa, ex.: penicilina benzatina).
+ * um array `indications`. Cada indicação tem:
+ *   - route: 'oral' | 'im' | 'ev' | 'im_ev' | 'fixed' — diz qual
+ *     concentração usar pro cálculo de volume (ou as duas, se im_ev)
+ *   - durationDays: número de dias de tratamento, quando a fonte
+ *     especifica um valor claro. Quando null, a duração varia demais
+ *     por gravidade/evolução clínica pra caber num número fixo — o
+ *     campo fica em branco na tela pro prescritor preencher.
+ *   - concentration (opcional, no nível da indicação): sobrescreve a
+ *     concentração da droga quando a indicação usa uma formulação ou
+ *     referência de cálculo diferente (ex.: amoxicilina+clavulanato
+ *     tem duas formulações com concentrações e fracionamentos
+ *     diferentes — Clavulin vs. Novamox).
+ *
+ * Concentrações EV que exigem diluição pra infusão trazem um campo
+ * `dilution` (volume + diluente) junto da concentração da solução
+ * reconstituída (antes de diluir).
  *
  * Onde havia divergência entre fontes (bula nacional/FDA vs. HSL), foi
- * adotado o valor mais conservador — não é mais documentado o
- * contraste entre fontes no texto exibido ao usuário, só o valor final
- * usado no cálculo.
+ * adotado o valor mais conservador — o texto exibido ao usuário mostra
+ * só o valor final usado no cálculo, sem contrastar as fontes.
  *
  * Fontes: bulas profissionais nacionais (Anvisa) e/ou FDA quando a
  * nacional não estava disponível, cruzadas com o Guia Farmacêutico do
@@ -49,12 +60,13 @@ export const antibiotics = [
     },
     indications: [
       {
-        name: 'Posologia geral',
+        name: 'Posologia geral (8/8h)',
         doseUnit: 'mg/kg/dia',
         doseMin: 20,
         doseMax: 100,
         dosesPerDay: 3,
         doseDefault: 50,
+        durationDays: null,
         route: 'oral',
         ageWarning: 'Neonatos e lactentes ≤ 3 meses: não ultrapassar 30mg/kg/dia, dividida em 12/12h.',
         specialConsiderations: [
@@ -74,33 +86,50 @@ export const antibiotics = [
     id: 'amoxicilina-clavulanato',
     name: 'Amoxicilina + Clavulanato de Potássio',
     category: ANTIBIOTIC_CATEGORIES.PENICILINAS,
-    presentation: ['Clavulin® 250mg+62,5mg/5mL pó para suspensão oral'],
+    presentation: ['Clavulin® 250mg+62,5mg/5mL', 'Novamox® 400mg+57mg/5mL'],
     therapeuticClass: 'Antimicrobiano, Penicilina + Inibidor de Beta-Lactamase',
     routeOfAdministration: 'Oral',
-    concentration: {
-      oral: { value: 50, unit: 'mg/mL', note: 'suspensão 250mg+62,5mg/5mL, componente amoxicilina' },
-    },
     indications: [
       {
-        name: 'Posologia geral (suspensão oral)',
+        name: 'Clavulin® 250mg+62,5mg/5mL (8/8h)',
         doseUnit: 'mg/kg/dia',
         doseMin: 20,
         doseMax: 60,
         dosesPerDay: 3,
         doseDefault: 50,
+        durationDays: null,
         route: 'oral',
-        ageWarning: 'Sem dados acima de 40mg/kg/dia em menores de 2 anos. Neonatos e lactentes < 12 semanas: 30mg/kg/dia (componente amoxicilina), 12/12h.',
+        concentration: { oral: { value: 50, unit: 'mg/mL', note: 'Clavulin 250mg+62,5mg/5mL, componente amoxicilina' } },
+        ageWarning: 'Sem dados acima de 40/10mg/kg/dia em menores de 2 anos. Neonatos e lactentes < 12 semanas: 30mg/kg/dia (componente amoxicilina), 12/12h.',
         specialConsiderations: [
           'Dose calculada pelo componente amoxicilina.',
           'Dose baixa (20-40mg/kg/dia): infecções leves/moderadas. Dose alta (40-60mg/kg/dia): infecções mais graves (otite média, sinusite, broncopneumonia, ITU).',
-          'Fracionamento 8/8h (3x/dia), suspensão 250mg/5mL.',
           'Duração recomendada para otite média aguda: 10 dias.',
           'Dose máxima: < 40kg → até 60mg/kg/dia; ≥ 40kg → dose de adulto.',
         ],
-        alerts: [
-          'O fracionamento depende da concentração da suspensão usada — confirmar qual está disponível antes de prescrever.',
-        ],
+        alerts: [],
         calcNote: 'Dose (amoxicilina) × Peso ÷ 3 = dose por tomada',
+        source: 'Bula profissional + Guia Farmacêutico HSL',
+      },
+      {
+        name: 'Novamox® 400mg+57mg/5mL (12/12h)',
+        doseUnit: 'mg/kg/dia',
+        doseMin: 20,
+        doseMax: 60,
+        dosesPerDay: 2,
+        doseDefault: 50,
+        durationDays: null,
+        route: 'oral',
+        concentration: { oral: { value: 80, unit: 'mg/mL', note: 'Novamox 400mg+57mg/5mL, componente amoxicilina' } },
+        ageWarning: 'Sem dados acima de 40/10mg/kg/dia em menores de 2 anos. Neonatos e lactentes < 12 semanas: 30mg/kg/dia (componente amoxicilina), 12/12h.',
+        specialConsiderations: [
+          'Dose calculada pelo componente amoxicilina.',
+          'Dose baixa (20-40mg/kg/dia): infecções leves/moderadas. Dose alta (40-60mg/kg/dia): infecções mais graves (otite média, sinusite, broncopneumonia, ITU).',
+          'Duração recomendada para otite média aguda: 10 dias.',
+          'Dose máxima: < 40kg → até 60mg/kg/dia; ≥ 40kg → dose de adulto.',
+        ],
+        alerts: [],
+        calcNote: 'Dose (amoxicilina) × Peso ÷ 2 = dose por tomada',
         source: 'Bula profissional + Guia Farmacêutico HSL',
       },
       {
@@ -110,6 +139,7 @@ export const antibiotics = [
         doseMax: 18.75,
         dosesPerDay: 2,
         doseDefault: 18.75,
+        durationDays: null,
         route: 'oral',
         concentration: { oral: { value: 62.5, unit: 'mg/mL', note: 'baseado no total Clavulin (amoxicilina+clavulanato)' } },
         ageWarning: null,
@@ -137,25 +167,24 @@ export const antibiotics = [
     },
     indications: [
       {
-        name: 'Posologia geral',
+        name: 'Posologia geral (1x/dia)',
         doseUnit: 'mg/kg/dia',
         doseMin: 10,
         doseMax: 10,
         dosesPerDay: 1,
         doseDefault: 10,
+        durationDays: 3,
         route: 'oral',
         ageWarning: null,
         specialConsiderations: [
-          'Dose única diária, sem fracionar.',
-          'Regime padrão: 10mg/kg/dia por 3 dias.',
           'Regime alternativo de 5 dias: 10mg/kg no 1º dia, seguido de 5mg/kg/dia do 2º ao 5º dia.',
           'Faringite estreptocócica: alternativa de 20mg/kg/dia por 3 dias, sem exceder 500mg/dia.',
           'Administrar 1h antes ou 2h após as refeições.',
           'Dose máxima: 1500mg para o tratamento completo.',
-          'Peso acima de 45kg: usar dose de adulto — 500mg/dia por 3 dias.',
+          'Peso acima de 45 kg: usar dose de adulto — 500mg/dia por 3 dias.',
         ],
         alerts: [],
-        calcNote: 'Dose × Peso = dose diária única — repetir 1x/dia por 3 dias; limitar a 1500mg no tratamento',
+        calcNote: 'Dose × Peso = dose diária única — limitar a 1500mg no tratamento',
         source: 'Bula profissional + Guia Farmacêutico HSL',
       },
       {
@@ -165,6 +194,7 @@ export const antibiotics = [
         doseMax: 30,
         dosesPerDay: 1,
         doseDefault: 30,
+        durationDays: 1,
         route: 'oral',
         ageWarning: null,
         specialConsiderations: [
@@ -190,16 +220,16 @@ export const antibiotics = [
     },
     indications: [
       {
-        name: 'Posologia geral',
+        name: 'Posologia geral (6/6h)',
         doseUnit: 'mg/kg/dia',
         doseMin: 50,
         doseMax: 50,
         dosesPerDay: 4,
         doseDefault: 50,
+        durationDays: null,
         route: 'oral',
         ageWarning: 'Uso a partir de 1 ano de idade.',
         specialConsiderations: [
-          '50mg/kg/dia, fracionada em 4x/dia (6/6h).',
           'Fracionamento alternativo em 2x/dia (12/12h) para casos leves — faringite, ITU não complicada, pele —, faixa 25-50mg/kg/dia.',
           'Infecções graves: dose pode ser dobrada (até 100mg/kg/dia).',
           'Faringite estreptocócica: tratamento mínimo de 10 dias.',
@@ -216,6 +246,7 @@ export const antibiotics = [
         doseMax: 100,
         dosesPerDay: 4,
         doseDefault: 100,
+        durationDays: null,
         route: 'oral',
         ageWarning: 'Uso a partir de 1 ano de idade.',
         specialConsiderations: [
@@ -240,17 +271,18 @@ export const antibiotics = [
     },
     indications: [
       {
-        name: 'Posologia geral',
+        name: 'Posologia geral (12/12h)',
         doseUnit: 'mg/kg/dia',
         doseMin: 6,
         doseMax: 8,
         dosesPerDay: 2,
         doseDefault: 8,
+        durationDays: 5,
         route: 'oral',
         ageWarning: 'Uso a partir de 6 semanas de vida.',
         specialConsiderations: [
           'Dose calculada pelo componente trimetoprima — o sulfametoxazol acompanha na proporção 1:5.',
-          'Fracionamento: 12/12h, de preferência após uma refeição.',
+          'Administrar de preferência após uma refeição.',
           'Duração mínima: 5 dias, ou até 2 dias assintomático. Reavaliar se não houver melhora em 7 dias.',
           'Ajuste renal: Clcr > 30 — sem ajuste; Clcr 15-30 — 50% da dose; Clcr < 15 — uso não recomendado.',
           'Dose máxima: 20mg/kg/dia de trimetoprima.',
@@ -281,12 +313,13 @@ export const antibiotics = [
         doseMax: 1200000,
         dosesPerDay: 1,
         doseDefault: 600000,
+        durationDays: 1,
         route: 'im',
         ageWarning: null,
         specialConsiderations: [
           'Dose fixa por faixa de peso, não por kg: até 27kg → 300.000-600.000 UI; crianças maiores → 900.000 UI; adultos → 1.200.000 UI — sempre dose única.',
           'Via IM profunda exclusivamente.',
-          'Profilaxia de febre reumática/glomerulonefrite: repetir 1.200.000 UI a cada 4 semanas.',
+          'Profilaxia de febre reumática/glomerulonefrite: repetir 1.200.000 UI a cada 4 semanas (uso periódico, não representado pelo campo de duração).',
           'Ajuste renal: Clcr 10-50 — 75% da dose; Clcr < 10 — 20-50% da dose. Administrar após hemodiálise.',
         ],
         alerts: [
@@ -309,17 +342,17 @@ export const antibiotics = [
     },
     indications: [
       {
-        name: 'Posologia geral',
+        name: 'Posologia geral (12/12h)',
         doseUnit: 'mg/kg/dia',
         doseMin: 15,
         doseMax: 15,
         dosesPerDay: 2,
         doseDefault: 15,
+        durationDays: 7,
         route: 'oral',
         ageWarning: 'Uso a partir de 6 meses de vida.',
         specialConsiderations: [
-          'Equivalente a 7,5mg/kg/dose, a cada 12 horas.',
-          'Duração do tratamento: 5-10 dias (até 14 dias em casos específicos).',
+          'Duração pode variar de 5 a 10 dias (7 dias usado como valor padrão) — ajustar conforme indicação clínica.',
           'Pode ser administrada com ou sem alimentos, inclusive com leite.',
           'Cautela em pacientes em uso de anticoagulantes — risco aumentado de sangramento.',
           'Ajuste renal: Clcr < 30 — reduzir a dose em 50%.',
@@ -343,21 +376,35 @@ export const antibiotics = [
     concentration: {
       oral: { value: 50, unit: 'mg/mL', note: 'suspensão 250mg/5mL' },
       im: { value: 250, unit: 'mg/mL', note: 'frasco 750mg reconstituído com 3mL de água destilada' },
-      ev: { value: 125, unit: 'mg/mL', note: 'frasco 750mg reconstituído com 6mL de água destilada, antes de diluir pra infusão' },
+      ev: {
+        value: 125,
+        unit: 'mg/mL',
+        note: 'frasco 750mg reconstituído com 6mL de água destilada',
+        dilution: {
+          volumeMin: 50,
+          volumeMax: 100,
+          unit: 'mL',
+          diluent: 'SF 0,9%, SG 5%, SG 10% ou RL',
+          infusionMin: 15,
+          infusionMax: 30,
+          infusionUnit: 'min',
+        },
+      },
     },
     indications: [
       {
-        name: 'Posologia geral (via oral)',
+        name: 'Posologia geral (via oral, 12/12h)',
         doseUnit: 'mg/kg/dia',
         doseMin: 20,
         doseMax: 20,
         dosesPerDay: 2,
         doseDefault: 20,
+        durationDays: 7,
         route: 'oral',
         ageWarning: 'Sem dados abaixo de 3 meses de idade.',
         specialConsiderations: [
           '20mg/kg/dia (10mg/kg/dose, 12/12h): amigdalite, faringite, sinusite, bronquite.',
-          'Duração usual: 7 dias (5 a 10 dias).',
+          'Duração pode variar de 5 a 10 dias (7 dias usado como valor padrão).',
           'Ingerir preferencialmente após as refeições.',
           'Dose máxima: 250mg/dia.',
           'Ajuste renal: Clcr > 30 — sem ajuste; Clcr 10-29 — a cada 24h; Clcr < 10 — a cada 48h.',
@@ -367,17 +414,18 @@ export const antibiotics = [
         source: 'Bula profissional + Guia Farmacêutico HSL',
       },
       {
-        name: 'Otite média, sinusite, pneumonia, ITU e pele (dose elevada)',
+        name: 'Otite média, sinusite, pneumonia, ITU e pele (dose elevada, 12/12h)',
         doseUnit: 'mg/kg/dia',
         doseMin: 30,
         doseMax: 30,
         dosesPerDay: 2,
         doseDefault: 30,
+        durationDays: 7,
         route: 'oral',
         ageWarning: 'Otite média, pneumonia e piodermites: uso a partir de 2 anos.',
         specialConsiderations: [
           '30mg/kg/dia (15mg/kg/dose, 12/12h).',
-          'Duração usual: 7 dias (5 a 10 dias).',
+          'Duração pode variar de 5 a 10 dias (7 dias usado como valor padrão).',
           'Dose máxima: 500mg/dia.',
         ],
         alerts: [],
@@ -385,12 +433,13 @@ export const antibiotics = [
         source: 'Bula profissional + Guia Farmacêutico HSL',
       },
       {
-        name: 'Via parenteral (IM/EV)',
+        name: 'Via parenteral (IM/EV, 8/8h)',
         doseUnit: 'mg/kg/dia',
         doseMin: 75,
         doseMax: 240,
         dosesPerDay: 3,
         doseDefault: 150,
+        durationDays: null,
         route: 'im_ev',
         ageWarning: null,
         specialConsiderations: [
@@ -416,16 +465,17 @@ export const antibiotics = [
     },
     indications: [
       {
-        name: 'Posologia geral',
+        name: 'Posologia geral (8/8h)',
         doseUnit: 'mg/kg/dia',
         doseMin: 20,
         doseMax: 20,
         dosesPerDay: 3,
         doseDefault: 20,
+        durationDays: null,
         route: 'oral',
         ageWarning: 'Uso a partir de 1 mês de idade.',
         specialConsiderations: [
-          '20mg/kg/dia, a cada 8 horas — trato respiratório inferior (incluindo pneumonia), pele, trato urinário.',
+          'Trato respiratório inferior (incluindo pneumonia), pele, trato urinário.',
           'Faringite/amigdalite: mesma dose, pode ser fracionada em 12/12h.',
           'Faringite estreptocócica: tratamento mínimo de 10 dias.',
           'Penicilina continua sendo o fármaco de escolha para faringite estreptocócica — cefaclor é alternativa.',
@@ -435,25 +485,25 @@ export const antibiotics = [
         alerts: [
           'Cepas de H. influenzae resistentes à ampicilina (BLNAR) devem ser consideradas resistentes ao cefaclor, mesmo com suscetibilidade aparente in vitro.',
         ],
-        calcNote: 'Dose × Peso ÷ 3 = dose por tomada (8/8h) — faringite pode usar ÷ 2 (12/12h)',
+        calcNote: 'Dose × Peso ÷ 3 = dose por tomada (8/8h)',
         source: 'Bula profissional + Guia Farmacêutico HSL',
       },
       {
-        name: 'Dose elevada (otite média / infecções graves)',
+        name: 'Dose elevada (otite média / infecções graves, 12/12h)',
         doseUnit: 'mg/kg/dia',
         doseMin: 40,
         doseMax: 40,
         dosesPerDay: 2,
         doseDefault: 40,
+        durationDays: null,
         route: 'oral',
         ageWarning: 'Uso a partir de 1 mês de idade.',
         specialConsiderations: [
-          'Otite média aguda: 40mg/kg/dia, podendo ser administrada a cada 12 horas.',
-          'Mesma dose elevada para infecções respiratórias, de pele e urinárias mais graves.',
+          'Otite média aguda, e infecções respiratórias, de pele e urinárias mais graves.',
           'Dose máxima: 1g/dia.',
         ],
         alerts: [],
-        calcNote: 'Dose × Peso ÷ 2 = dose por tomada (12/12h, otite) — outras indicações podem manter ÷ 3',
+        calcNote: 'Dose × Peso ÷ 2 = dose por tomada (12/12h)',
         source: 'Bula profissional',
       },
     ],
@@ -467,22 +517,33 @@ export const antibiotics = [
     routeOfAdministration: 'IM e EV',
     concentration: {
       im: { value: 285.7, unit: 'mg/mL', note: 'frasco 1g reconstituído com 3,5mL de lidocaína 1%' },
-      ev: { value: 100, unit: 'mg/mL', note: 'frasco 1g reconstituído com 10mL de água destilada, antes de diluir pra infusão' },
+      ev: {
+        value: 100,
+        unit: 'mg/mL',
+        note: 'frasco 1g reconstituído com 10mL de água destilada',
+        dilution: {
+          volume: 100,
+          unit: 'mL',
+          diluent: 'SF 0,9%',
+          infusionTime: 60,
+          infusionUnit: 'min',
+        },
+      },
     },
     indications: [
       {
-        name: 'Posologia geral (15 dias a 12 anos, < 50kg)',
+        name: 'Posologia geral (15 dias a 12 anos, < 50kg — 1x/dia)',
         doseUnit: 'mg/kg/dia',
         doseMin: 20,
         doseMax: 80,
         dosesPerDay: 1,
         doseDefault: 50,
+        durationDays: null,
         route: 'im_ev',
         ageWarning: 'Recém-nascidos < 14 dias têm posologia própria — ver indicação separada. Crianças ≥ 50kg: usar dose de adulto (1-2g dose única diária; casos graves, até 4g).',
         specialConsiderations: [
-          'Dose única diária (24h).',
           'Doses EV ≥ 50mg/kg devem ser infundidas em período ≥ 30 minutos.',
-          'Manter por, no mínimo, 48-72h após desaparecimento da febre ou erradicação bacteriana.',
+          'Manter por, no mínimo, 48-72h após desaparecimento da febre ou erradicação bacteriana — duração total varia por indicação.',
           'IM: dissolver 1g em 3,5mL de lidocaína 1%; não injetar mais de 1g por sítio, em região glútea.',
           'EV direta: 3-5 minutos. EV diluída: acima de 30 minutos (padrão institucional: 60 minutos).',
           'Dose máxima: 4g/dia (2g/dia se houver disfunção hepática associada).',
@@ -496,16 +557,16 @@ export const antibiotics = [
         source: 'Bula profissional + Guia Farmacêutico HSL',
       },
       {
-        name: 'Recém-nascidos < 14 dias (CRÍTICO)',
+        name: 'Recém-nascidos < 14 dias (CRÍTICO — 1x/dia)',
         doseUnit: 'mg/kg/dia',
         doseMin: 20,
         doseMax: 50,
         dosesPerDay: 1,
         doseDefault: 50,
+        durationDays: null,
         route: 'im_ev',
         ageWarning: 'Restrito a recém-nascidos com menos de 14 dias. NÃO ultrapassar 50mg/kg.',
         specialConsiderations: [
-          'Dose única diária (24h).',
           'Doses EV devem ser administradas durante 60 minutos, para reduzir o risco de encefalopatia bilirrubínica.',
         ],
         alerts: [
@@ -527,16 +588,29 @@ export const antibiotics = [
     routeOfAdministration: 'IM e EV',
     concentration: {
       im: { value: 333.3, unit: 'mg/mL', note: 'frasco 1g reconstituído com 3mL de água destilada' },
-      ev: { value: 333.3, unit: 'mg/mL', note: 'frasco 1g reconstituído com 3mL de água destilada, antes de diluir pra infusão' },
+      ev: {
+        value: 333.3,
+        unit: 'mg/mL',
+        note: 'frasco 1g reconstituído com 3mL de água destilada',
+        dilution: {
+          volumeMin: 50,
+          volumeMax: 100,
+          unit: 'mL',
+          diluent: 'SF 0,9%, SG 5% ou Ringer-Lactato',
+          infusionTime: 30,
+          infusionUnit: 'min',
+        },
+      },
     },
     indications: [
       {
-        name: 'Via EV/IM — crianças (> 1 mês)',
+        name: 'Via EV/IM — crianças > 1 mês (6/6h)',
         doseUnit: 'mg/kg/dia',
         doseMin: 100,
         doseMax: 400,
         dosesPerDay: 4,
         doseDefault: 200,
+        durationDays: null,
         route: 'im_ev',
         ageWarning: 'Acima de 1 mês. Recém-nascidos têm estrutura de dose própria — ver indicação separada.',
         specialConsiderations: [
@@ -552,12 +626,13 @@ export const antibiotics = [
         source: 'Guia Farmacêutico HSL',
       },
       {
-        name: 'Via EV/IM — recém-nascidos (> 2kg)',
+        name: 'Via EV/IM — recém-nascidos > 2kg',
         doseUnit: 'mg/kg/dose',
         doseMin: 50,
         doseMax: 100,
         dosesPerDay: 4,
         doseDefault: 50,
+        durationDays: null,
         route: 'im_ev',
         ageWarning: 'Restrito a recém-nascidos com peso > 2kg.',
         specialConsiderations: [
@@ -565,7 +640,7 @@ export const antibiotics = [
           '> 7 dias, sepse/meningite: 50-75mg/kg/dose a cada 6h.',
           '< 7 dias, uso geral: 50mg/kg/dose a cada 8h.',
           '< 7 dias, sepse/meningite: 50-100mg/kg/dose a cada 12h.',
-          'Selecionar a combinação de idade e gravidade correta antes de calcular.',
+          'Selecionar a combinação de idade e gravidade correta antes de calcular — ajustar o número de tomadas conforme a tabela acima.',
         ],
         alerts: [
           'Incompatível com aminoglicosídeos (ex.: gentamicina) na mesma seringa.',
@@ -584,22 +659,35 @@ export const antibiotics = [
     routeOfAdministration: 'IM e EV',
     concentration: {
       im: { value: 40, unit: 'mg/mL', note: 'ampola pronta para uso' },
-      ev: { value: 40, unit: 'mg/mL', note: 'ampola pronta para uso, diluir pra infusão' },
+      ev: {
+        value: 40,
+        unit: 'mg/mL',
+        note: 'ampola pronta para uso',
+        dilution: {
+          volumeMin: 50,
+          volumeMax: 200,
+          unit: 'mL',
+          diluent: 'SF 0,9%, SG 5% ou RL',
+          infusionMin: 30,
+          infusionMax: 120,
+          infusionUnit: 'min',
+        },
+      },
     },
     indications: [
       {
-        name: 'Via IM/EV — pediatria (função renal normal)',
+        name: 'Via IM/EV — pediatria, função renal normal (8/8h)',
         doseUnit: 'mg/kg/dia',
         doseMin: 6,
         doseMax: 7.5,
         dosesPerDay: 3,
         doseDefault: 7.5,
+        durationDays: 7,
         route: 'im_ev',
         ageWarning: 'Válida para crianças, lactentes e neonatos com mais de 1 semana. Neonatos ≤ 1 semana têm dose própria — ver indicação separada.',
         specialConsiderations: [
-          'Dose máxima: 7,5mg/kg/dia (2,5mg/kg a cada 8h), com função renal normal.',
+          'Duração pode variar de 7 a 10 dias. Cursos além de 10 dias exigem monitoramento renal, auditivo e vestibular.',
           'Alvos de concentração sérica: pico ≤ 12mcg/mL; vale ≤ 2mcg/mL.',
-          'Duração usual: 7-10 dias. Cursos além de 10 dias exigem monitoramento renal, auditivo e vestibular.',
           'Calcular a dose sobre o peso ideal, não o peso real.',
           'Ajuste renal: Clcr 60-79 — 4mg/kg a cada 24h; Clcr 50 — 3,5mg/kg a cada 24h; Clcr 40 — 2,5mg/kg a cada 24h; Clcr < 30 — guiado por concentração sérica.',
         ],
@@ -610,16 +698,17 @@ export const antibiotics = [
         source: 'Bula profissional + Guia Farmacêutico HSL',
       },
       {
-        name: 'Neonatos ≤ 1 semana de vida',
+        name: 'Neonatos ≤ 1 semana de vida (12/12h)',
         doseUnit: 'mg/kg/dia',
         doseMin: 5,
         doseMax: 5,
         dosesPerDay: 2,
         doseDefault: 5,
+        durationDays: 7,
         route: 'im_ev',
         ageWarning: 'Restrito a neonatos com 1 semana de vida ou menos.',
         specialConsiderations: [
-          'Dose máxima: 5mg/kg/dia, como 2,5mg/kg a cada 12 horas.',
+          'Duração pode variar de 7 a 10 dias.',
           'Mesmos alvos de concentração sérica e mesma orientação de peso ideal da indicação geral.',
         ],
         alerts: [
