@@ -22,7 +22,7 @@ export default function ModuleLinkCard({ module }) {
       </div>
       <div className="flex-1 min-w-0">
         <div className="font-bold text-foreground text-base leading-tight">{module.label}</div>
-        <div className="text-xs text-muted-foreground mt-0.5 hidden">{module.subtitle}</div>
+        
       </div>
       <ChevronRight size={16} className="text-muted-foreground flex-shrink-0" />
     </Link>);
