@@ -166,7 +166,7 @@ export const MODULE_REGISTRY = [
     ],
   },
 
-  // ── Módulo 2: Antibióticos (em breve) ─────────────────────────────────────
+  // ── Módulo 2: Antibióticos ────────────────────────────────────────────────
   {
     id: 'antibioticos',
     type: MODULE_TYPES.ANTIBIOTIC,
@@ -174,7 +174,7 @@ export const MODULE_REGISTRY = [
     subtitle: 'Doses por peso e função renal',
     iconName: 'Shield',
     palette: 'green',
-    status: 'soon',
+    status: 'active',
     route: '/antibioticos',
   },
 
