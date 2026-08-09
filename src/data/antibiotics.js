@@ -89,7 +89,7 @@ export const antibiotics = [
         dosesPerDay: 3,
         doseDefault: 50,
         route: 'oral',
-        ageWarning: 'Sem dados acima de 40/10mg/kg/dia em menores de 2 anos. Neonatos e lactentes < 12 semanas: 30mg/kg/dia (componente amoxicilina), 12/12h.',
+        ageWarning: 'Sem dados acima de 40mg/kg/dia em menores de 2 anos. Neonatos e lactentes < 12 semanas: 30mg/kg/dia (componente amoxicilina), 12/12h.',
         specialConsiderations: [
           'Dose calculada pelo componente amoxicilina.',
           'Dose baixa (20-40mg/kg/dia): infecções leves/moderadas. Dose alta (40-60mg/kg/dia): infecções mais graves (otite média, sinusite, broncopneumonia, ITU).',
