@@ -11,6 +11,8 @@ import Home from '@/pages/Home';
 import DrugCalculator from '@/pages/DrugCalculator';
 import ComparativeTable from '@/pages/ComparativeTable';
 import Admin from '@/pages/Admin';
+import AntibioticList from '@/pages/AntibioticList';
+import AntibioticDetail from '@/pages/AntibioticDetail';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -36,6 +38,8 @@ const AuthenticatedApp = () => {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/drug/:drugId" element={<DrugCalculator />} />
+      <Route path="/antibioticos" element={<AntibioticList />} />
+      <Route path="/antibioticos/:drugId" element={<AntibioticDetail />} />
       <Route path="/comparative" element={<ComparativeTable />} />
       <Route path="/admin" element={<Admin />} />
       <Route path="*" element={<PageNotFound />} />
