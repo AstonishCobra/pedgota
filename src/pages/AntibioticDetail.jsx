@@ -5,53 +5,70 @@ import { antibiotics, getAntibioticCategoryLabel } from '@/data/antibiotics';
 
 // ─── Lógica de cálculo ──────────────────────────────────────────────────────
 //
-// A base de dados de antibióticos usa convenções de doseUnit diferentes
-// conforme a droga/indicação (ver comentário no topo de antibiotics.js):
-//   - 'mg/kg/dia' ou 'UI/kg/dia' etc → multiplicar pelo peso dá a dose
-//     TOTAL DIÁRIA; dividir por `dosesPerDay` dá a dose por tomada.
-//   - 'mg/kg/dose' → multiplicar pelo peso já dá a dose POR TOMADA
-//     diretamente; `dosesPerDay` só informa a frequência esperada.
-//   - 'mg/kg' (sem '/dia' nem '/dose') → dose ÚNICA para todo o
-//     tratamento (ex.: azitromicina em otite) — não se divide por
-//     `dosesPerDay`.
-//   - 'UI' ou 'mg' (sem '/kg' em nenhuma forma) → dose FIXA por faixa de
-//     peso, informada diretamente pela bula — NÃO multiplicar pelo peso
-//     (ex.: penicilina G benzatina, ou a variante de dose fixa por
-//     idade da amoxicilina).
-function calculateDose(indication, weight, doseValue) {
+// Ver comentário no topo de antibiotics.js para a convenção de doseUnit.
+// Aqui, além da dose em mg/UI, calculamos o VOLUME correspondente usando
+// a concentração da droga (drug.concentration), que varia por via
+// ('oral' | 'im' | 'ev'). Quando a indicação é 'im_ev', calculamos os
+// dois volumes (IM e EV) — o resultado final mostrado ao usuário é
+// sempre em mL, nunca só em mg.
+function calculateDoseMg(indication, weight, doseValue) {
   const { doseUnit, dosesPerDay } = indication;
   const isPerKg = doseUnit.includes('/kg');
 
   if (!isPerKg) {
-    // Dose fixa por faixa de peso — não multiplica.
+    // Dose fixa por faixa de peso — não multiplica (ex.: penicilina benzatina).
     const perDose = doseValue;
-    return {
-      mode: 'fixed',
-      perDose,
-      totalDaily: dosesPerDay > 1 ? perDose * dosesPerDay : null,
-    };
+    return { mode: 'fixed', perDose, totalDaily: dosesPerDay > 1 ? perDose * dosesPerDay : null };
   }
-
   if (doseUnit.includes('/dose')) {
     const perDose = doseValue * weight;
     return { mode: 'per-dose', perDose, totalDaily: perDose * dosesPerDay };
   }
-
   if (!doseUnit.includes('/dia')) {
     // 'mg/kg' puro — dose única para o tratamento inteiro.
     const singleDose = doseValue * weight;
     return { mode: 'single', perDose: singleDose, totalDaily: null };
   }
-
-  // '.../dia' — padrão mais comum.
   const totalDaily = doseValue * weight;
   const perDose = dosesPerDay > 0 ? totalDaily / dosesPerDay : totalDaily;
   return { mode: 'daily', perDose, totalDaily };
 }
 
-function round(n) {
+function round(n, decimals = 2) {
   if (n === null || n === undefined || Number.isNaN(n)) return null;
-  return Math.round(n * 100) / 100;
+  const factor = 10 ** decimals;
+  return Math.round(n * factor) / factor;
+}
+
+function volumeFor(mgOrUI, concentration) {
+  if (!concentration || !concentration.value) return null;
+  return mgOrUI / concentration.value;
+}
+
+// Rótulos usados nos cartões de resultado, por via.
+const ROUTE_LABEL = {
+  oral: 'Via oral',
+  im: 'Via IM',
+  ev: 'Via EV',
+};
+
+function VolumeCard({ label, volumeMl, concentration, extra }) {
+  if (volumeMl === null) return null;
+  return (
+    <div className="rounded-xl border border-border bg-card/50 p-4">
+      <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">{label}</div>
+      <div className="flex items-baseline gap-1.5">
+        <span className="text-2xl font-bold text-emerald-600">{round(volumeMl)}</span>
+        <span className="text-sm text-muted-foreground">mL por tomada</span>
+      </div>
+      {concentration?.note && (
+        <p className="text-xs text-muted-foreground mt-1">
+          Concentração: {concentration.value}{concentration.unit} — {concentration.note}
+        </p>
+      )}
+      {extra}
+    </div>
+  );
 }
 
 // ─── Componente ─────────────────────────────────────────────────────────────
@@ -66,18 +83,40 @@ export default function AntibioticDetail() {
   const [weight, setWeight] = useState('');
   const [doseValue, setDoseValue] = useState(indication ? indication.doseDefault : '');
 
-  // Ao trocar de indicação, resetar a dose para o default da nova indicação —
-  // evita carregar um valor fora de faixa de uma indicação pra outra.
   useEffect(() => {
     if (indication) setDoseValue(indication.doseDefault);
   }, [indicationIndex]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const result = useMemo(() => {
+  const doseResult = useMemo(() => {
     const w = parseFloat(weight);
     const d = parseFloat(doseValue);
     if (!indication || !w || w <= 0 || Number.isNaN(d)) return null;
-    return calculateDose(indication, w, d);
+    return calculateDoseMg(indication, w, d);
   }, [indication, weight, doseValue]);
+
+  // Concentração(ões) relevante(s) pra esta indicação, considerando
+  // override no nível da indicação (ex.: ajuste renal do
+  // amoxicilina-clavulanato usa concentração diferente da posologia geral).
+  const concentrations = useMemo(() => {
+    if (!drug || !indication) return {};
+    return indication.concentration ?? drug.concentration ?? {};
+  }, [drug, indication]);
+
+  const volumes = useMemo(() => {
+    if (!doseResult) return {};
+    const perDose = doseResult.perDose;
+    const route = indication.route;
+    if (route === 'oral') return { oral: volumeFor(perDose, concentrations.oral) };
+    if (route === 'im') return { im: volumeFor(perDose, concentrations.im) };
+    if (route === 'ev') return { ev: volumeFor(perDose, concentrations.ev) };
+    if (route === 'im_ev') {
+      return {
+        im: volumeFor(perDose, concentrations.im),
+        ev: volumeFor(perDose, concentrations.ev),
+      };
+    }
+    return {};
+  }, [doseResult, indication, concentrations]);
 
   if (!drug) {
     return (
@@ -113,7 +152,6 @@ export default function AntibioticDetail() {
           </div>
         </div>
 
-        {/* Seletor de indicação — só aparece quando a droga tem mais de uma */}
         {drug.indications.length > 1 && (
           <div className="max-w-2xl mx-auto px-4 flex gap-1 pb-2 overflow-x-auto">
             {drug.indications.map((ind, i) => (
@@ -176,24 +214,40 @@ export default function AntibioticDetail() {
             </div>
           )}
 
-          {result ? (
-            <div className="rounded-xl border border-border bg-card/50 overflow-hidden">
-              <div className={`grid ${result.totalDaily !== null ? 'grid-cols-2' : 'grid-cols-1'} divide-x divide-border`}>
-                <div className="p-4 text-center">
-                  <div className="text-2xl font-bold text-emerald-600">{round(result.perDose)}</div>
-                  <div className="text-xs text-muted-foreground mt-1">
-                    mg por {result.mode === 'single' ? 'dose única' : 'tomada'}
-                  </div>
+          {doseResult ? (
+            <div className="space-y-3">
+              {volumes.oral !== undefined && volumes.oral !== null && (
+                <VolumeCard
+                  label={`${ROUTE_LABEL.oral} — suspensão`}
+                  volumeMl={volumes.oral}
+                  concentration={concentrations.oral}
+                />
+              )}
+              {volumes.im !== undefined && volumes.im !== null && (
+                <VolumeCard
+                  label={`${ROUTE_LABEL.im} — aspirar e aplicar`}
+                  volumeMl={volumes.im}
+                  concentration={concentrations.im}
+                />
+              )}
+              {volumes.ev !== undefined && volumes.ev !== null && (
+                <VolumeCard
+                  label={`${ROUTE_LABEL.ev} — diluir e infundir`}
+                  volumeMl={volumes.ev}
+                  concentration={concentrations.ev}
+                  extra={
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Volume da solução reconstituída antes de diluir — ver instruções de infusão nas considerações abaixo.
+                    </p>
+                  }
+                />
+              )}
+              {doseResult.totalDaily !== null && (
+                <div className="text-xs text-muted-foreground text-center">
+                  Dose diária total: {round(doseResult.totalDaily)} {indication.doseUnit.includes('UI') ? 'UI' : 'mg'}
+                  {' '}({indication.dosesPerDay}x/dia)
                 </div>
-                {result.totalDaily !== null && (
-                  <div className="p-4 text-center">
-                    <div className="text-2xl font-bold text-foreground">{round(result.totalDaily)}</div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      mg/dia ({indication.dosesPerDay}x/dia)
-                    </div>
-                  </div>
-                )}
-              </div>
+              )}
             </div>
           ) : (
             <div className="rounded-xl border border-border bg-card/30 p-6 text-center">
@@ -207,7 +261,6 @@ export default function AntibioticDetail() {
           </div>
         </div>
 
-        {/* Aviso de idade */}
         {indication.ageWarning && (
           <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-4">
             <div className="flex items-start gap-2">
@@ -217,7 +270,6 @@ export default function AntibioticDetail() {
           </div>
         )}
 
-        {/* Alertas críticos / discrepâncias entre fontes */}
         {indication.alerts?.length > 0 && (
           <div className="rounded-xl border border-red-500/40 bg-red-500/10 p-4 space-y-2">
             <div className="flex items-center gap-2 mb-1">
@@ -230,9 +282,8 @@ export default function AntibioticDetail() {
           </div>
         )}
 
-        {/* Considerações especiais */}
         {indication.specialConsiderations?.length > 0 && (
-          <InfoSection title="Considerações Especiais" icon="📋">
+          <InfoSection title="Considerações" icon="📋">
             <ul className="space-y-1.5">
               {indication.specialConsiderations.map((c, i) => (
                 <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
@@ -243,7 +294,6 @@ export default function AntibioticDetail() {
           </InfoSection>
         )}
 
-        {/* Ficha técnica da droga */}
         <InfoSection title="Apresentação" icon="💊">
           {Array.isArray(drug.presentation) ? (
             <ul className="space-y-1">
@@ -255,18 +305,6 @@ export default function AntibioticDetail() {
             <p className="text-sm text-muted-foreground">{drug.presentation}</p>
           )}
         </InfoSection>
-
-        {drug.mechanism && (
-          <InfoSection title="Mecanismo de Ação" icon="⚡">
-            <p className="text-sm text-muted-foreground leading-relaxed">{drug.mechanism}</p>
-          </InfoSection>
-        )}
-
-        {drug.routeOfAdministration && (
-          <InfoSection title="Via de Administração" icon="💉">
-            <p className="text-sm text-muted-foreground">{drug.routeOfAdministration}</p>
-          </InfoSection>
-        )}
 
         <InfoSection title="Fonte" icon="📚">
           <p className="text-xs text-muted-foreground leading-relaxed">{indication.source}</p>
