@@ -1,22 +1,16 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ChevronLeft, AlertTriangle, Info } from 'lucide-react';
+import { ChevronLeft, AlertTriangle, Info, Copy, Check } from 'lucide-react';
 import { antibiotics, getAntibioticCategoryLabel } from '@/data/antibiotics';
 
 // ─── Lógica de cálculo ──────────────────────────────────────────────────────
 //
 // Ver comentário no topo de antibiotics.js para a convenção de doseUnit.
-// Aqui, além da dose em mg/UI, calculamos o VOLUME correspondente usando
-// a concentração da droga (drug.concentration), que varia por via
-// ('oral' | 'im' | 'ev'). Quando a indicação é 'im_ev', calculamos os
-// dois volumes (IM e EV) — o resultado final mostrado ao usuário é
-// sempre em mL, nunca só em mg.
 function calculateDoseMg(indication, weight, doseValue) {
   const { doseUnit, dosesPerDay } = indication;
   const isPerKg = doseUnit.includes('/kg');
 
   if (!isPerKg) {
-    // Dose fixa por faixa de peso — não multiplica (ex.: penicilina benzatina).
     const perDose = doseValue;
     return { mode: 'fixed', perDose, totalDaily: dosesPerDay > 1 ? perDose * dosesPerDay : null };
   }
@@ -25,7 +19,6 @@ function calculateDoseMg(indication, weight, doseValue) {
     return { mode: 'per-dose', perDose, totalDaily: perDose * dosesPerDay };
   }
   if (!doseUnit.includes('/dia')) {
-    // 'mg/kg' puro — dose única para o tratamento inteiro.
     const singleDose = doseValue * weight;
     return { mode: 'single', perDose: singleDose, totalDaily: null };
   }
@@ -45,28 +38,83 @@ function volumeFor(mgOrUI, concentration) {
   return mgOrUI / concentration.value;
 }
 
-// Rótulos usados nos cartões de resultado, por via.
-const ROUTE_LABEL = {
-  oral: 'Via oral',
-  im: 'Via IM',
-  ev: 'Via EV',
-};
+// "8/8h", "12/12h", "6/6h", "24/24h" a partir de dosesPerDay. Dose
+// única (mode 'single' ou 'fixed' com 1x) não usa esse rótulo — é
+// tratada separadamente como "dose única".
+function scheduleLabel(dosesPerDay) {
+  if (!dosesPerDay || dosesPerDay <= 0) return '';
+  const interval = Math.round(24 / dosesPerDay);
+  return `${interval}/${interval}h`;
+}
 
-function VolumeCard({ label, volumeMl, concentration, extra }) {
-  if (volumeMl === null) return null;
+// Formata um valor único ("100") ou uma faixa ("50-100") — usado pra
+// volume de diluição e tempo de infusão, que na fonte (HSL) às vezes
+// vêm como valor único (padrão institucional) e às vezes como faixa
+// (deixada a critério médico, não escolhemos um ponto fixo dentro
+// dela).
+function rangeLabel(single, min, max, unit) {
+  if (single !== undefined && single !== null) return `${single}${unit}`;
+  if (min !== undefined && max !== undefined) return `${min}-${max}${unit}`;
+  return null;
+}
+
+const ROUTE_NAME = { oral: 'Via Oral (VO)', im: 'Via Intramuscular (IM)', ev: 'Via Intravenosa (EV)' };
+
+// ─── Bloco de receita por via ───────────────────────────────────────────────
+//
+// Formato: Via de administração / Princípio (apresentação/concentração)
+// / quantidade em mL, horários, quantidade de dias. Para EV, também
+// mostra o volume de diluição.
+function PrescriptionBlock({ routeKey, drug, indication, volumeMl, concentration, isSingleDose, durationDays }) {
+  if (volumeMl === null || volumeMl === undefined) return null;
+  const schedule = isSingleDose ? 'Dose única' : scheduleLabel(indication.dosesPerDay);
+
   return (
-    <div className="rounded-xl border border-border bg-card/50 p-4">
-      <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">{label}</div>
-      <div className="flex items-baseline gap-1.5">
-        <span className="text-2xl font-bold text-emerald-600">{round(volumeMl)}</span>
-        <span className="text-sm text-muted-foreground">mL por tomada</span>
+    <div className="rounded-xl border border-emerald-500/30 bg-card/60 overflow-hidden">
+      <div className="bg-emerald-500/10 px-4 py-2 border-b border-emerald-500/20">
+        <span className="text-xs font-bold uppercase tracking-wide text-emerald-700">{ROUTE_NAME[routeKey]}</span>
       </div>
-      {concentration?.note && (
-        <p className="text-xs text-muted-foreground mt-1">
-          Concentração: {concentration.value}{concentration.unit} — {concentration.note}
-        </p>
-      )}
-      {extra}
+      <div className="p-4 space-y-2.5">
+        <div>
+          <p className="text-xs text-muted-foreground uppercase tracking-wide">Princípio (apresentação/concentração)</p>
+          <p className="text-sm font-medium text-foreground">
+            {drug.name} — {concentration?.value}{concentration?.unit}
+            {concentration?.note ? ` (${concentration.note})` : ''}
+          </p>
+        </div>
+
+        <div className="flex items-baseline gap-2">
+          <span className="text-2xl font-bold text-emerald-600">{round(volumeMl)} mL</span>
+          <span className="text-sm text-muted-foreground">
+            {isSingleDose ? 'dose única' : `a cada ${schedule.split('/')[0]}h`}
+          </span>
+        </div>
+
+        {!isSingleDose && (
+          <p className="text-sm text-muted-foreground">
+            Horário: <span className="font-medium text-foreground">{schedule}</span>
+            {'  •  '}
+            Duração:{' '}
+            <span className="font-medium text-foreground">
+              {durationDays ? `${durationDays} ${durationDays === 1 ? 'dia' : 'dias'}` : 'definir conforme quadro clínico'}
+            </span>
+          </p>
+        )}
+
+        {routeKey === 'ev' && concentration?.dilution && (
+          <p className="text-sm text-muted-foreground border-t border-border/50 pt-2 mt-2">
+            Diluir em{' '}
+            <span className="font-medium text-foreground">
+              {rangeLabel(concentration.dilution.volume, concentration.dilution.volumeMin, concentration.dilution.volumeMax, concentration.dilution.unit)} de {concentration.dilution.diluent}
+            </span>
+            {' e infundir em '}
+            <span className="font-medium text-foreground">
+              {rangeLabel(concentration.dilution.infusionTime, concentration.dilution.infusionMin, concentration.dilution.infusionMax, concentration.dilution.infusionUnit)}
+            </span>
+            .
+          </p>
+        )}
+      </div>
     </div>
   );
 }
@@ -82,9 +130,14 @@ export default function AntibioticDetail() {
 
   const [weight, setWeight] = useState('');
   const [doseValue, setDoseValue] = useState(indication ? indication.doseDefault : '');
+  const [durationDays, setDurationDays] = useState(indication ? indication.durationDays : null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    if (indication) setDoseValue(indication.doseDefault);
+    if (indication) {
+      setDoseValue(indication.doseDefault);
+      setDurationDays(indication.durationDays);
+    }
   }, [indicationIndex]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const doseResult = useMemo(() => {
@@ -94,9 +147,6 @@ export default function AntibioticDetail() {
     return calculateDoseMg(indication, w, d);
   }, [indication, weight, doseValue]);
 
-  // Concentração(ões) relevante(s) pra esta indicação, considerando
-  // override no nível da indicação (ex.: ajuste renal do
-  // amoxicilina-clavulanato usa concentração diferente da posologia geral).
   const concentrations = useMemo(() => {
     if (!drug || !indication) return {};
     return indication.concentration ?? drug.concentration ?? {};
@@ -110,13 +160,45 @@ export default function AntibioticDetail() {
     if (route === 'im') return { im: volumeFor(perDose, concentrations.im) };
     if (route === 'ev') return { ev: volumeFor(perDose, concentrations.ev) };
     if (route === 'im_ev') {
-      return {
-        im: volumeFor(perDose, concentrations.im),
-        ev: volumeFor(perDose, concentrations.ev),
-      };
+      return { im: volumeFor(perDose, concentrations.im), ev: volumeFor(perDose, concentrations.ev) };
     }
     return {};
   }, [doseResult, indication, concentrations]);
+
+  const isSingleDose = doseResult && (doseResult.mode === 'single' || (doseResult.mode === 'fixed' && indication?.dosesPerDay === 1 && indication?.durationDays === 1));
+
+  const prescriptionText = useMemo(() => {
+    if (!doseResult || !drug || !indication) return '';
+    const lines = [`${drug.name} — ${indication.name}`];
+    ['oral', 'im', 'ev'].forEach((routeKey) => {
+      const vol = volumes[routeKey];
+      if (vol === null || vol === undefined) return;
+      const c = concentrations[routeKey];
+      lines.push('');
+      lines.push(ROUTE_NAME[routeKey]);
+      lines.push(`${drug.name} ${c?.value}${c?.unit}`);
+      if (isSingleDose) {
+        lines.push(`${round(vol)}mL — dose única`);
+      } else {
+        const schedule = scheduleLabel(indication.dosesPerDay);
+        lines.push(`${round(vol)}mL a cada ${schedule.split('/')[0]}h, por ${durationDays ? `${durationDays} dias` : '___ dias'}`);
+      }
+      if (routeKey === 'ev' && c?.dilution) {
+        const volLabel = rangeLabel(c.dilution.volume, c.dilution.volumeMin, c.dilution.volumeMax, c.dilution.unit);
+        const infLabel = rangeLabel(c.dilution.infusionTime, c.dilution.infusionMin, c.dilution.infusionMax, c.dilution.infusionUnit);
+        lines.push(`Diluir em ${volLabel} de ${c.dilution.diluent} e infundir em ${infLabel}.`);
+      }
+    });
+    return lines.join('\n');
+  }, [doseResult, drug, indication, volumes, concentrations, isSingleDose, durationDays]);
+
+  const handleCopy = () => {
+    if (!prescriptionText) return;
+    navigator.clipboard.writeText(prescriptionText).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
 
   if (!drug) {
     return (
@@ -135,7 +217,6 @@ export default function AntibioticDetail() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Header */}
       <div className="border-b border-border sticky top-0 z-10 bg-background/95 backdrop-blur">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
           <Link to="/antibioticos" className="text-muted-foreground hover:text-foreground transition-colors">
@@ -172,8 +253,8 @@ export default function AntibioticDetail() {
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
-        {/* Calculadora */}
-        <div className="rounded-xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 p-5 space-y-5">
+        {/* Inputs */}
+        <div className="rounded-xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 p-5 space-y-4">
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider">
@@ -207,58 +288,54 @@ export default function AntibioticDetail() {
             </div>
           </div>
 
+          {!isSingleDose && (
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Duração do tratamento (dias)
+              </label>
+              <input
+                type="number"
+                inputMode="numeric"
+                value={durationDays ?? ''}
+                onChange={(e) => setDurationDays(e.target.value ? parseInt(e.target.value, 10) : null)}
+                placeholder="definir conforme quadro clínico"
+                className="w-full bg-card border border-border px-3 py-2.5 text-sm text-foreground focus:outline-none focus:border-emerald-500 transition-colors"
+              />
+            </div>
+          )}
+
           {isDoseOutOfRange && (
             <div className="flex items-start gap-2 text-xs text-orange-700 bg-orange-500/10 border border-orange-500/30 px-3 py-2 rounded-lg">
               <AlertTriangle size={13} className="flex-shrink-0 mt-0.5" />
               <span>Dose fora da faixa recomendada para esta indicação.</span>
             </div>
           )}
+        </div>
 
-          {doseResult ? (
-            <div className="space-y-3">
-              {volumes.oral !== undefined && volumes.oral !== null && (
-                <VolumeCard
-                  label={`${ROUTE_LABEL.oral} — suspensão`}
-                  volumeMl={volumes.oral}
-                  concentration={concentrations.oral}
-                />
-              )}
-              {volumes.im !== undefined && volumes.im !== null && (
-                <VolumeCard
-                  label={`${ROUTE_LABEL.im} — aspirar e aplicar`}
-                  volumeMl={volumes.im}
-                  concentration={concentrations.im}
-                />
-              )}
-              {volumes.ev !== undefined && volumes.ev !== null && (
-                <VolumeCard
-                  label={`${ROUTE_LABEL.ev} — diluir e infundir`}
-                  volumeMl={volumes.ev}
-                  concentration={concentrations.ev}
-                  extra={
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Volume da solução reconstituída antes de diluir — ver instruções de infusão nas considerações abaixo.
-                    </p>
-                  }
-                />
-              )}
-              {doseResult.totalDaily !== null && (
-                <div className="text-sm text-muted-foreground text-center">
-                  Dose diária total: {round(doseResult.totalDaily)} {indication.doseUnit.includes('UI') ? 'UI' : 'mg'}
-                  {' '}({indication.dosesPerDay}x/dia)
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="rounded-xl border border-border bg-card/30 p-6 text-center">
-              <p className="text-muted-foreground text-sm">Informe o peso para calcular</p>
-            </div>
-          )}
+        {/* Receita */}
+        {doseResult ? (
+          <div className="space-y-3">
+            <PrescriptionBlock routeKey="oral" drug={drug} indication={indication} volumeMl={volumes.oral} concentration={concentrations.oral} isSingleDose={isSingleDose} durationDays={durationDays} />
+            <PrescriptionBlock routeKey="im" drug={drug} indication={indication} volumeMl={volumes.im} concentration={concentrations.im} isSingleDose={isSingleDose} durationDays={durationDays} />
+            <PrescriptionBlock routeKey="ev" drug={drug} indication={indication} volumeMl={volumes.ev} concentration={concentrations.ev} isSingleDose={isSingleDose} durationDays={durationDays} />
 
-          <div className="flex items-start gap-2 text-xs text-muted-foreground">
-            <Info size={12} className="flex-shrink-0 mt-0.5" />
-            <span>{indication.calcNote}</span>
+            <button
+              onClick={handleCopy}
+              className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium border border-border rounded-xl text-muted-foreground hover:text-foreground hover:border-emerald-500/40 transition-colors"
+            >
+              {copied ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
+              {copied ? 'Copiado' : 'Copiar receita'}
+            </button>
           </div>
+        ) : (
+          <div className="rounded-xl border border-border bg-card/30 p-6 text-center">
+            <p className="text-muted-foreground text-sm">Informe o peso para calcular</p>
+          </div>
+        )}
+
+        <div className="flex items-start gap-2 text-xs text-muted-foreground">
+          <Info size={12} className="flex-shrink-0 mt-0.5" />
+          <span>{indication.calcNote}</span>
         </div>
 
         {indication.ageWarning && (
