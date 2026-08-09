@@ -5,6 +5,7 @@ import { getDrugs } from '@/lib/drugStore';
 const drugs = getDrugs();
 import { MODULE_REGISTRY, MODULE_TYPES, PALETTES } from '@/modules/registry';
 import InfusionModuleCard from '@/components/home/InfusionModuleCard';
+import ModuleLinkCard from '@/components/home/ModuleLinkCard';
 
 // Busca rápida por drogas de infusão contínua
 function SearchResults({ search }) {
@@ -125,7 +126,10 @@ export default function Home() {
             if (module.type === MODULE_TYPES.INFUSION) {
               return <InfusionModuleCard key={module.id} module={module} />;
             }
-            // Outros tipos ativos: link direto (ex: Antibióticos quando lançar)
+            // Outros tipos ativos com navegação direta (ex.: Antibióticos)
+            if (module.route) {
+              return <ModuleLinkCard key={module.id} module={module} />;
+            }
             return null;
           })}
 
