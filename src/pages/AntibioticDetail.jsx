@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ChevronLeft, AlertTriangle, Info, Copy, Check } from 'lucide-react';
+import { ChevronLeft, ChevronDown, AlertTriangle, Info, Copy, Check } from 'lucide-react';
 import { antibiotics, getAntibioticCategoryLabel } from '@/data/antibiotics';
 
 // ─── Lógica de cálculo ──────────────────────────────────────────────────────
@@ -45,6 +45,20 @@ function scheduleLabel(dosesPerDay) {
   if (!dosesPerDay || dosesPerDay <= 0) return '';
   const interval = Math.round(24 / dosesPerDay);
   return `${interval}/${interval}h`;
+}
+
+// Rótulo curto pra aba de indicação — remove o horário (ex.: "8/8h",
+// "1x/dia") do nome pra economizar espaço. O horário continua visível
+// no bloco de receita, onde já aparece o intervalo real.
+function tabLabel(name) {
+  return name
+    .replace(/\s*[—–,]\s*\d+x\/dia/g, '')
+    .replace(/\s*[—–,]\s*\d+\/\d+h/g, '')
+    .replace(/\s*\(\s*\d+x\/dia\s*\)/g, '')
+    .replace(/\s*\(\s*\d+\/\d+h\s*\)/g, '')
+    .replace(/\(\s*\)/g, '')
+    .replace(/\s+\)/g, ')')
+    .trim();
 }
 
 // Formata um valor único ("100") ou uma faixa ("50-100") — usado pra
@@ -239,13 +253,13 @@ export default function AntibioticDetail() {
               <button
                 key={i}
                 onClick={() => setIndicationIndex(i)}
-                className={`px-3 py-1.5 text-xs font-medium whitespace-nowrap rounded-full border transition-colors ${
+                className={`px-3.5 py-2 text-xs font-semibold whitespace-nowrap rounded-full border transition-colors ${
                   i === indicationIndex
-                    ? 'bg-emerald-500/15 text-emerald-700 border-emerald-500/40'
-                    : 'border-border text-muted-foreground hover:text-foreground'
+                    ? 'bg-emerald-500 text-white border-emerald-500 shadow-sm'
+                    : 'bg-card border-border text-foreground/80 hover:border-emerald-500/40 hover:text-foreground'
                 }`}
               >
-                {ind.name}
+                {tabLabel(ind.name)}
               </button>
             ))}
           </div>
@@ -392,13 +406,22 @@ export default function AntibioticDetail() {
 }
 
 function InfoSection({ title, icon, children }) {
+  const [open, setOpen] = useState(false);
   return (
-    <div className="rounded-xl border border-border bg-card/40 p-4 space-y-3">
-      <div className="flex items-center gap-2">
+    <div className="rounded-xl border border-border bg-card/40 overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center gap-2 p-4 text-left hover:bg-muted/30 transition-colors"
+      >
         <span>{icon}</span>
-        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{title}</h3>
-      </div>
-      {children}
+        <h3 className="flex-1 text-sm font-semibold text-muted-foreground uppercase tracking-wide">{title}</h3>
+        <ChevronDown
+          size={16}
+          className={`text-muted-foreground transition-transform ${open ? 'rotate-180' : ''}`}
+        />
+      </button>
+      {open && <div className="px-4 pb-4 space-y-3">{children}</div>}
     </div>
   );
 }
