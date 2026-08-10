@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Activity, ChevronRight, Table2, X, Settings } from 'lucide-react';
+import { ChevronRight, X } from 'lucide-react';
 import { getDrugs } from '@/lib/drugStore';
 const drugs = getDrugs();
+import { antibiotics, ANTIBIOTIC_CATEGORIES, getAntibioticCategoryLabel } from '@/data/antibiotics';
 import { MODULE_REGISTRY, MODULE_TYPES, PALETTES } from '@/modules/registry';
-import InfusionModuleCard from '@/components/home/InfusionModuleCard';
 import ModuleLinkCard from '@/components/home/ModuleLinkCard';
+import ModuleSoonCard from '@/components/home/ModuleSoonCard';
 
-// Busca rápida por drogas de infusão contínua
+// Busca global — abrange drogas de Infusão Contínua e de Drogas
+// (Antibióticos), independente de qual página cada uma mora.
 function SearchResults({ search }) {
   const lower = search.toLowerCase();
   const matched = drugs.filter(
@@ -25,7 +27,31 @@ function SearchResults({ search }) {
   })).
   filter((g) => g.list.length > 0);
 
-  if (matched.length === 0) {
+  // Busca em antibióticos — droga por droga (não por indicação), já
+  // que o resultado leva pra tela de detalhe da droga, onde o usuário
+  // escolhe a indicação se houver mais de uma.
+  const matchedAntibiotics = antibiotics.filter(
+    (d) =>
+    d.name.toLowerCase().includes(lower) ||
+    d.therapeuticClass.toLowerCase().includes(lower)
+  );
+  const antibioticCategoryOrder = [
+    ANTIBIOTIC_CATEGORIES.PENICILINAS,
+    ANTIBIOTIC_CATEGORIES.CEFALOSPORINAS,
+    ANTIBIOTIC_CATEGORIES.MACROLIDEOS,
+    ANTIBIOTIC_CATEGORIES.SULFONAMIDAS,
+    ANTIBIOTIC_CATEGORIES.AMINOGLICOSIDEOS,
+  ];
+  const antibioticGroups = antibioticCategoryOrder.
+  map((categoryId) => ({
+    categoryId,
+    list: matchedAntibiotics.filter((d) => d.category === categoryId)
+  })).
+  filter((g) => g.list.length > 0);
+
+  const hasAnyResult = matched.length > 0 || matchedAntibiotics.length > 0;
+
+  if (!hasAnyResult) {
     return (
       <div className="text-center py-16">
         <p className="text-muted-foreground text-sm">Nenhuma droga encontrada para "{search}"</p>
@@ -64,6 +90,44 @@ function SearchResults({ search }) {
           </div>);
 
       })}
+
+      {antibioticGroups.length > 0 &&
+      <div>
+          <p className="text-xs font-bold uppercase tracking-widest mb-2 text-emerald-600">
+            Antibióticos
+          </p>
+          <div className="space-y-4">
+            {antibioticGroups.map(({ categoryId, list }) =>
+            <div key={categoryId}>
+                <p className="text-xs font-semibold text-muted-foreground mb-1.5">
+                  {getAntibioticCategoryLabel(categoryId)}
+                </p>
+                <div className="space-y-1.5">
+                  {list.map((drug) =>
+                <Link
+                  key={drug.id}
+                  to={`/antibioticos/${drug.id}`}
+                  className="flex items-center gap-3 px-4 py-3.5 border border-emerald-500/20 bg-card transition-colors hover:border-emerald-500/50 hover:bg-emerald-500/5">
+                  
+                      <div className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-emerald-500" />
+                      <div className="flex-1 min-w-0">
+                        <span className="font-semibold text-sm text-foreground">{drug.name}</span>
+                        <p className="text-xs text-muted-foreground mt-0.5">{drug.therapeuticClass}</p>
+                      </div>
+                      {drug.indications.length > 1 &&
+                  <span className="text-xs bg-emerald-500/15 text-emerald-700 border border-emerald-500/30 px-1.5 py-0.5 font-medium leading-none">
+                          {drug.indications.length} indicações
+                        </span>
+                  }
+                      <ChevronRight size={14} className="text-muted-foreground" />
+                    </Link>
+                )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      }
     </div>);
 
 }
@@ -72,22 +136,19 @@ export default function Home() {
   const [search, setSearch] = useState('');
   const isSearching = search.trim().length > 0;
 
+  // Home simplificada: 3 módulos de topo — Infusão Contínua, Drogas e
+  // Emergências (esta última 'soon', não construída ainda). Cada
+  // módulo ativo leva pra sua própria página (nada fica embutido
+  // aqui, diferente da arquitetura anterior).
   const visibleModules = MODULE_REGISTRY.filter((m) => m.status !== 'hidden');
-  const activeModules = visibleModules.filter((m) => m.status === 'active');
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
       <div className="max-w-xl mx-auto px-4 pt-10 pb-2">
-        
-
-
-
-
-
-
-
-        
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">PediDrip</h1>
+        </div>
 
         {/* Search */}
         <div className="relative">
@@ -116,47 +177,20 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="max-w-xl mx-auto px-4 pt-5 pb-8 space-y-4">
+      <div className="max-w-xl mx-auto px-4 pt-5 pb-8 space-y-2">
         {isSearching ?
         <SearchResults search={search} /> :
 
         <>
-            {/* Módulos ativos */}
-            {activeModules.map((module) => {
-            if (module.type === MODULE_TYPES.INFUSION) {
-              return <InfusionModuleCard key={module.id} module={module} />;
-            }
-            // Outros tipos ativos com navegação direta (ex.: Antibióticos)
-            if (module.route) {
-              return <ModuleLinkCard key={module.id} module={module} />;
-            }
-            return null;
-          })}
+            {visibleModules.map((module) =>
+          module.status === 'active' ?
+          <ModuleLinkCard key={module.id} module={module} /> :
 
-            {/* Tabela comparativa (específica do módulo de infusão) */}
-            <Link
-            to="/comparative"
-            className="flex items-center gap-4 p-5 border border-border bg-card hover:bg-muted hover:border-primary/40 transition-all">
-            
-              <div className="w-11 h-11 bg-muted flex items-center justify-center flex-shrink-0">
-                <Table2 size={18} className="text-muted-foreground" />
-              </div>
-              <div className="flex-1">
-                <div className="font-bold text-foreground text-base leading-tight">Tabela Comparativa</div>
-                <div className="text-xs text-muted-foreground mt-0.5">Indicações, doses e efeitos adversos lado a lado</div>
-              </div>
-              <ChevronRight size={16} className="text-muted-foreground flex-shrink-0" />
-            </Link>
+          <ModuleSoonCard key={module.id} item={module} />
 
+          )}
           </>
         }
-        {/* Link discreto para painel admin */}
-        <div className="pt-4 text-center">
-          <Link to="/admin" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground/70 hover:text-muted-foreground transition-colors">
-            <Settings size={11} /> Admin
-          </Link>
-        </div>
-
       </div>
     </div>);
 
