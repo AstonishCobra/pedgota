@@ -1,11 +1,15 @@
 /**
  * REGISTRO CENTRAL DE MÓDULOS — PediDrip
  *
- * Para adicionar um novo módulo:
- *   1. Crie o arquivo de dados em src/data/<modulo>.js  (opcional)
- *   2. Crie a página em src/pages/<Modulo>.jsx
- *   3. Adicione a rota em src/App.jsx
- *   4. Registre o módulo aqui — apenas uma entrada no array MODULE_REGISTRY
+ * ⚠️ ARQUITETURA SIMPLIFICADA (decisão do usuário, com desenho anexado
+ * na conversa): apenas 3 módulos de topo — Infusão Contínua, Drogas e
+ * Emergências. Os módulos anteriores (Bolus, Reposição Volêmica,
+ * Intubação, Calculadoras Pediátricas, Outras Classes) foram REMOVIDOS
+ * do registro — não fazem mais parte do plano do app.
+ *
+ * Diferente da arquitetura anterior, "Antibióticos" NÃO é mais um
+ * módulo de topo — agora é um item dentro do hub "Drogas"
+ * (ver DRUG_HUB_ITEMS abaixo), junto com "Outras Drogas" (futuro).
  *
  * status:
  *   'active'   → visível e acessível
@@ -15,14 +19,9 @@
 
 // ─── Tipos de módulo ───────────────────────────────────────────────────────────
 export const MODULE_TYPES = {
-  INFUSION: 'infusion',       // calculadora de infusão contínua (modelo atual)
-  ANTIBIOTIC: 'antibiotic',   // antibióticos
-  BOLUS: 'bolus',             // drogas em bolus
-  EMERGENCY: 'emergency',     // emergências pediátricas
-  VOLUME: 'volume',           // reposição volêmica
-  INTUBATION: 'intubation',   // intubação
-  CALCULATOR: 'calculator',   // calculadoras pediátricas gerais
-  OTHER: 'other',             // outras classes medicamentosas
+  INFUSION: 'infusion',   // calculadora de infusão contínua — página própria
+  DRUGS: 'drugs',         // hub "Drogas" — reúne Antibióticos e (futuramente) outras classes
+  EMERGENCY: 'emergency', // emergências pediátricas — futuro, não construído ainda
 };
 
 // ─── Paletas de cor disponíveis ────────────────────────────────────────────────
@@ -115,25 +114,32 @@ export const PALETTES = {
     rowHover: 'hover:bg-rose-500/5',
     badge: 'bg-rose-500/15 text-rose-700 border border-rose-500/30',
   },
+  slate: {
+    accent: 'text-slate-500',
+    cardBorder: 'border-slate-300',
+    cardBg: 'bg-slate-50',
+    cardHover: '',
+    iconBg: 'bg-slate-200',
+    dot: 'bg-slate-400',
+    rowBorder: 'border-slate-200',
+    rowHover: '',
+    badge: 'bg-slate-200 text-slate-500 border border-slate-300',
+  },
 };
 
-// ─── REGISTRO CENTRAL DE MÓDULOS ──────────────────────────────────────────────
-//
-// Cada módulo de tipo INFUSION possui `getDrugs()` e `getRoute(drug)`
-// para a lógica de listagem expansível existente.
-// Módulos de outros tipos usam apenas `route` para navegação direta.
-//
+// ─── REGISTRO CENTRAL DE MÓDULOS (3 apenas) ───────────────────────────────────
 export const MODULE_REGISTRY = [
-  // ── Módulo 1: Infusões Contínuas ─────────────────────────────────────────
+  // ── Módulo 1: Infusão Contínua — página própria (/infusao-continua) ────────
   {
-    id: 'infusoes-continuas',
+    id: 'infusao-continua',
     type: MODULE_TYPES.INFUSION,
-    label: 'Infusões Contínuas',
+    label: 'Infusão Contínua',
     subtitle: 'Vasoativas, sedativos e BNM',
     iconName: 'Droplets',
     palette: 'amber',
     status: 'active',
-    // Subcategorias internas (o módulo de infusão mantém estrutura de drug categories)
+    route: '/infusao-continua',
+    // Subcategorias internas, usadas pela página InfusaoContinua.jsx
     subcategories: [
       {
         id: 'vasoativas',
@@ -166,10 +172,38 @@ export const MODULE_REGISTRY = [
     ],
   },
 
-  // ── Módulo 2: Antibióticos ────────────────────────────────────────────────
+  // ── Módulo 2: Drogas — página própria (/drogas), hub de classes ────────────
+  {
+    id: 'drogas',
+    type: MODULE_TYPES.DRUGS,
+    label: 'Drogas',
+    subtitle: 'Antibióticos e outras classes',
+    iconName: 'Pill',
+    palette: 'green',
+    status: 'active',
+    route: '/drogas',
+  },
+
+  // ── Módulo 3: Emergências — futuro, NÃO construir agora ─────────────────────
+  {
+    id: 'emergencias',
+    type: MODULE_TYPES.EMERGENCY,
+    label: 'Emergências',
+    subtitle: 'Em breve',
+    iconName: 'AlertOctagon',
+    palette: 'slate',
+    status: 'soon',
+    route: '/emergencias',
+  },
+];
+
+// ─── Itens do hub "Drogas" (/drogas) ───────────────────────────────────────────
+// Análogo às subcategorias do módulo de Infusão, mas pro hub de Drogas.
+// "Outras Drogas" é só um placeholder visual (status 'soon') até que
+// novas classes farmacológicas sejam construídas.
+export const DRUG_HUB_ITEMS = [
   {
     id: 'antibioticos',
-    type: MODULE_TYPES.ANTIBIOTIC,
     label: 'Antibióticos',
     subtitle: 'Doses por peso e função renal',
     iconName: 'Shield',
@@ -177,77 +211,13 @@ export const MODULE_REGISTRY = [
     status: 'active',
     route: '/antibioticos',
   },
-
-  // ── Módulo 3: Drogas em Bolus (em breve) ──────────────────────────────────
   {
-    id: 'bolus',
-    type: MODULE_TYPES.BOLUS,
-    label: 'Drogas em Bolus',
-    subtitle: 'Doses únicas por peso',
-    iconName: 'Syringe',
-    palette: 'orange',
-    status: 'soon',
-    route: '/bolus',
-  },
-
-  // ── Módulo 4: Emergências Pediátricas (em breve) ──────────────────────────
-  {
-    id: 'emergencias',
-    type: MODULE_TYPES.EMERGENCY,
-    label: 'Emergências Pediátricas',
-    subtitle: 'PCR, anafilaxia, convulsão',
-    iconName: 'AlertOctagon',
-    palette: 'red',
-    status: 'soon',
-    route: '/emergencias',
-  },
-
-  // ── Módulo 5: Reposição Volêmica (em breve) ───────────────────────────────
-  {
-    id: 'reposicao-volemica',
-    type: MODULE_TYPES.VOLUME,
-    label: 'Reposição Volêmica',
-    subtitle: 'Cristaloides e coloides',
-    iconName: 'Droplet',
-    palette: 'cyan',
-    status: 'soon',
-    route: '/reposicao-volemica',
-  },
-
-  // ── Módulo 6: Intubação (em breve) ────────────────────────────────────────
-  {
-    id: 'intubacao',
-    type: MODULE_TYPES.INTUBATION,
-    label: 'Intubação',
-    subtitle: 'Sequência rápida e parâmetros ventilatórios',
-    iconName: 'Wind',
-    palette: 'violet',
-    status: 'soon',
-    route: '/intubacao',
-  },
-
-  // ── Módulo 7: Calculadoras Pediátricas (em breve) ─────────────────────────
-  {
-    id: 'calculadoras',
-    type: MODULE_TYPES.CALCULATOR,
-    label: 'Calculadoras Pediátricas',
-    subtitle: 'Peso ideal, superfície corporal, clearance',
-    iconName: 'Calculator',
-    palette: 'rose',
-    status: 'soon',
-    route: '/calculadoras',
-  },
-
-  // ── Módulo 8: Outras Classes (em breve) ───────────────────────────────────
-  {
-    id: 'outras-classes',
-    type: MODULE_TYPES.OTHER,
-    label: 'Outras Classes',
-    subtitle: 'Diuréticos, corticoides e mais',
+    id: 'outras-drogas',
+    label: 'Outras Drogas',
+    subtitle: 'Em breve',
     iconName: 'Pill',
-    palette: 'indigo',
+    palette: 'slate',
     status: 'soon',
-    route: '/outras-classes',
   },
 ];
 
