@@ -93,7 +93,6 @@ function PrescriptionBlock({ routeKey, drug, indication, volumeMl, concentration
           <p className="text-xs text-muted-foreground uppercase tracking-wide">Princípio (apresentação/concentração)</p>
           <p className="text-sm font-medium text-foreground">
             {drug.name} — {concentration?.value}{concentration?.unit}
-            {concentration?.note ? ` (${concentration.note})` : ''}
           </p>
         </div>
 
