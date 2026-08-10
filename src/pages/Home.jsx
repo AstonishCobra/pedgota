@@ -36,12 +36,12 @@ function SearchResults({ search }) {
     d.therapeuticClass.toLowerCase().includes(lower)
   );
   const antibioticCategoryOrder = [
-    ANTIBIOTIC_CATEGORIES.PENICILINAS,
-    ANTIBIOTIC_CATEGORIES.CEFALOSPORINAS,
-    ANTIBIOTIC_CATEGORIES.MACROLIDEOS,
-    ANTIBIOTIC_CATEGORIES.SULFONAMIDAS,
-    ANTIBIOTIC_CATEGORIES.AMINOGLICOSIDEOS,
-  ];
+  ANTIBIOTIC_CATEGORIES.PENICILINAS,
+  ANTIBIOTIC_CATEGORIES.CEFALOSPORINAS,
+  ANTIBIOTIC_CATEGORIES.MACROLIDEOS,
+  ANTIBIOTIC_CATEGORIES.SULFONAMIDAS,
+  ANTIBIOTIC_CATEGORIES.AMINOGLICOSIDEOS];
+
   const antibioticGroups = antibioticCategoryOrder.
   map((categoryId) => ({
     categoryId,
@@ -98,16 +98,16 @@ function SearchResults({ search }) {
           </p>
           <div className="space-y-4">
             {antibioticGroups.map(({ categoryId, list }) =>
-            <div key={categoryId}>
+          <div key={categoryId}>
                 <p className="text-xs font-semibold text-muted-foreground mb-1.5">
                   {getAntibioticCategoryLabel(categoryId)}
                 </p>
                 <div className="space-y-1.5">
                   {list.map((drug) =>
-                <Link
-                  key={drug.id}
-                  to={`/antibioticos/${drug.id}`}
-                  className="flex items-center gap-3 px-4 py-3.5 border border-emerald-500/20 bg-card transition-colors hover:border-emerald-500/50 hover:bg-emerald-500/5">
+              <Link
+                key={drug.id}
+                to={`/antibioticos/${drug.id}`}
+                className="flex items-center gap-3 px-4 py-3.5 border border-emerald-500/20 bg-card transition-colors hover:border-emerald-500/50 hover:bg-emerald-500/5">
                   
                       <div className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-emerald-500" />
                       <div className="flex-1 min-w-0">
@@ -115,16 +115,16 @@ function SearchResults({ search }) {
                         <p className="text-xs text-muted-foreground mt-0.5">{drug.therapeuticClass}</p>
                       </div>
                       {drug.indications.length > 1 &&
-                  <span className="text-xs bg-emerald-500/15 text-emerald-700 border border-emerald-500/30 px-1.5 py-0.5 font-medium leading-none">
+                <span className="text-xs bg-emerald-500/15 text-emerald-700 border border-emerald-500/30 px-1.5 py-0.5 font-medium leading-none">
                           {drug.indications.length} indicações
                         </span>
-                  }
+                }
                       <ChevronRight size={14} className="text-muted-foreground" />
                     </Link>
-                )}
+              )}
                 </div>
               </div>
-            )}
+          )}
           </div>
         </div>
       }
@@ -147,7 +147,7 @@ export default function Home() {
       {/* Header */}
       <div className="max-w-xl mx-auto px-4 pt-10 pb-2">
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">PediDrip</h1>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Guia Pediátrico</h1>
         </div>
 
         {/* Search */}
