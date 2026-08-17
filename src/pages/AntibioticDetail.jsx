@@ -5,11 +5,30 @@ import { antibiotics, getAntibioticCategoryLabel } from '@/data/antibiotics';
 
 // ─── Lógica de cálculo ──────────────────────────────────────────────────────
 //
-// Ver comentário no topo de antibiotics.js para a convenção de doseUnit.
+// Ver comentário no topo de antibiotics.js para a convenção de doseUnit,
+// incluindo o modo especial 'fixed-by-weight' (dose fixa por faixa de
+// peso, sem campo editável — ex.: penicilina G benzatina).
+
+function resolveWeightBracket(weightBrackets, weight) {
+  // maxWeight é INCLUSIVO, minWeight é EXCLUSIVO — evita que um peso
+  // exatamente no limite caia em duas faixas ao mesmo tempo.
+  return weightBrackets.find((b) => {
+    const minOk = b.minWeight === undefined || weight > b.minWeight;
+    const maxOk = b.maxWeight === undefined || weight <= b.maxWeight;
+    return minOk && maxOk;
+  });
+}
+
 function calculateDoseMg(indication, weight, doseValue) {
   const { doseUnit, dosesPerDay } = indication;
-  const isPerKg = doseUnit.includes('/kg');
 
+  if (doseUnit === 'fixed-by-weight') {
+    const bracket = resolveWeightBracket(indication.weightBrackets, weight);
+    if (!bracket) return null;
+    return { mode: 'fixed-by-weight', perDose: bracket.doseUI, totalDaily: null, bracket };
+  }
+
+  const isPerKg = doseUnit.includes('/kg');
   if (!isPerKg) {
     const perDose = doseValue;
     return { mode: 'fixed', perDose, totalDaily: dosesPerDay > 1 ? perDose * dosesPerDay : null };
@@ -38,18 +57,12 @@ function volumeFor(mgOrUI, concentration) {
   return mgOrUI / concentration.value;
 }
 
-// "8/8h", "12/12h", "6/6h", "24/24h" a partir de dosesPerDay. Dose
-// única (mode 'single' ou 'fixed' com 1x) não usa esse rótulo — é
-// tratada separadamente como "dose única".
 function scheduleLabel(dosesPerDay) {
   if (!dosesPerDay || dosesPerDay <= 0) return '';
   const interval = Math.round(24 / dosesPerDay);
   return `${interval}/${interval}h`;
 }
 
-// Rótulo curto pra aba de indicação — remove o horário (ex.: "8/8h",
-// "1x/dia") do nome pra economizar espaço. O horário continua visível
-// no bloco de receita, onde já aparece o intervalo real.
 function tabLabel(name) {
   return name
     .replace(/\s*[—–,]\s*\d+x\/dia/g, '')
@@ -61,46 +74,96 @@ function tabLabel(name) {
     .trim();
 }
 
-// Formata um valor único ("100") ou uma faixa ("50-100") — usado pra
-// volume de diluição e tempo de infusão, que na fonte (HSL) às vezes
-// vêm como valor único (padrão institucional) e às vezes como faixa
-// (deixada a critério médico, não escolhemos um ponto fixo dentro
-// dela).
 function rangeLabel(single, min, max, unit) {
   if (single !== undefined && single !== null) return `${single}${unit}`;
   if (min !== undefined && max !== undefined) return `${min}-${max}${unit}`;
   return null;
 }
 
+// Deriva o "tipo" de via (pra rótulo/cor) a partir da chave de
+// concentração — ex.: 'im500', 'im1000', 'im600k' todas viram 'im'.
+function routeTypeFromKey(key) {
+  if (key.startsWith('oral')) return 'oral';
+  if (key.startsWith('im')) return 'im';
+  if (key.startsWith('ev')) return 'ev';
+  return key;
+}
+
 const ROUTE_NAME = { oral: 'Via Oral (VO)', im: 'Via Intramuscular (IM)', ev: 'Via Intravenosa (EV)' };
 
-// ─── Bloco de receita por via ───────────────────────────────────────────────
-//
-// Formato: Via de administração / Princípio (apresentação/concentração)
-// / quantidade em mL, horários, quantidade de dias. Para EV, também
-// mostra o volume de diluição.
-function PrescriptionBlock({ routeKey, drug, indication, volumeMl, concentration, isSingleDose, durationDays }) {
-  if (volumeMl === null || volumeMl === undefined) return null;
+// ─── Preparo (reconstituição) — SEMPRE renderizado no resultado ────────────
+function ReconstitutionBlock({ reconstitution }) {
+  if (!reconstitution) return null;
+  const items = Array.isArray(reconstitution) ? reconstitution : [reconstitution];
+  return (
+    <div className="text-sm text-muted-foreground border-t border-border/50 pt-2 mt-2 space-y-1">
+      <p className="text-xs font-semibold text-foreground uppercase tracking-wide">Preparo</p>
+      {items.map((r, i) => (
+        <p key={i}>
+          {r.vialLabel ? <span className="font-medium text-foreground">{r.vialLabel}: </span> : null}
+          Reconstituir em{' '}
+          <span className="font-medium text-foreground">
+            {r.diluentVolume}{r.diluentUnit} de {r.diluent}
+          </span>
+          {r.finalVolume ? ` (volume final: ${r.finalVolume}${r.finalVolumeUnit})` : ''}
+        </p>
+      ))}
+    </div>
+  );
+}
+
+// ─── Diluição pra infusão EV — SEMPRE renderizada no resultado ─────────────
+function DilutionBlock({ dilution }) {
+  if (!dilution) return null;
+  const volLabel = rangeLabel(dilution.volume, dilution.volumeMin, dilution.volumeMax, dilution.unit);
+  const infLabel = rangeLabel(dilution.infusionTime, dilution.infusionMin, dilution.infusionMax, dilution.infusionUnit);
+  return (
+    <p className="text-sm text-muted-foreground border-t border-border/50 pt-2 mt-2">
+      Diluir em{' '}
+      <span className="font-medium text-foreground">{volLabel} de {dilution.diluent}</span>
+      {infLabel && (
+        <>
+          {' e infundir em '}
+          <span className="font-medium text-foreground">{infLabel}</span>
+        </>
+      )}
+      .
+    </p>
+  );
+}
+
+// ─── Bloco de resultado por via/apresentação ───────────────────────────────
+function PrescriptionBlock({ concKey, drug, indication, resultValue, concentration, isSingleDose, durationDays, showUIEquivalent, uiValue }) {
+  if (resultValue === null || resultValue === undefined) return null;
+  const routeType = routeTypeFromKey(concKey);
   const schedule = isSingleDose ? 'Dose única' : scheduleLabel(indication.dosesPerDay);
+  const resultUnit = concentration?.resultUnit ?? 'mL';
 
   return (
     <div className="rounded-xl border border-emerald-500/30 bg-card/60 overflow-hidden">
       <div className="bg-emerald-500/10 px-4 py-2 border-b border-emerald-500/20">
-        <span className="text-xs font-bold uppercase tracking-wide text-emerald-700">{ROUTE_NAME[routeKey]}</span>
+        <span className="text-xs font-bold uppercase tracking-wide text-emerald-700">
+          {ROUTE_NAME[routeType]}
+        </span>
       </div>
       <div className="p-4 space-y-2.5">
         <div>
-          <p className="text-xs text-muted-foreground uppercase tracking-wide">Princípio (apresentação/concentração)</p>
+          <p className="text-xs text-muted-foreground uppercase tracking-wide">Princípio (apresentação)</p>
           <p className="text-sm font-medium text-foreground">
-            {drug.name} — {concentration?.value}{concentration?.unit}
+            {drug.name} — {concentration?.presentationLabel}
           </p>
         </div>
 
-        <div className="flex items-baseline gap-2">
-          <span className="text-2xl font-bold text-emerald-600">{round(volumeMl)} mL</span>
+        <div className="flex items-baseline gap-2 flex-wrap">
+          <span className="text-2xl font-bold text-emerald-600">{round(resultValue)} {resultUnit}</span>
           <span className="text-sm text-muted-foreground">
             {isSingleDose ? 'dose única' : `a cada ${schedule.split('/')[0]}h`}
           </span>
+          {showUIEquivalent && (
+            <span className="text-sm text-muted-foreground">
+              (equivalente a {uiValue?.toLocaleString('pt-BR')} UI)
+            </span>
+          )}
         </div>
 
         {!isSingleDose && (
@@ -114,19 +177,8 @@ function PrescriptionBlock({ routeKey, drug, indication, volumeMl, concentration
           </p>
         )}
 
-        {routeKey === 'ev' && concentration?.dilution && (
-          <p className="text-sm text-muted-foreground border-t border-border/50 pt-2 mt-2">
-            Diluir em{' '}
-            <span className="font-medium text-foreground">
-              {rangeLabel(concentration.dilution.volume, concentration.dilution.volumeMin, concentration.dilution.volumeMax, concentration.dilution.unit)} de {concentration.dilution.diluent}
-            </span>
-            {' e infundir em '}
-            <span className="font-medium text-foreground">
-              {rangeLabel(concentration.dilution.infusionTime, concentration.dilution.infusionMin, concentration.dilution.infusionMax, concentration.dilution.infusionUnit)}
-            </span>
-            .
-          </p>
-        )}
+        <ReconstitutionBlock reconstitution={concentration?.reconstitution} />
+        <DilutionBlock dilution={concentration?.dilution} />
       </div>
     </div>
   );
@@ -140,70 +192,86 @@ export default function AntibioticDetail() {
 
   const [indicationIndex, setIndicationIndex] = useState(0);
   const indication = drug?.indications?.[indicationIndex];
+  const isFixedByWeight = indication?.doseUnit === 'fixed-by-weight';
 
   const [weight, setWeight] = useState('');
-  const [doseValue, setDoseValue] = useState(indication ? indication.doseDefault : '');
+  const [doseValue, setDoseValue] = useState(indication && !isFixedByWeight ? indication.doseDefault : '');
   const [durationDays, setDurationDays] = useState(indication ? indication.durationDays : null);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (indication) {
-      setDoseValue(indication.doseDefault);
+      setDoseValue(indication.doseUnit === 'fixed-by-weight' ? '' : indication.doseDefault);
       setDurationDays(indication.durationDays);
     }
   }, [indicationIndex]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const weightNum = parseFloat(weight);
+
   const doseResult = useMemo(() => {
-    const w = parseFloat(weight);
+    if (!indication || !weightNum || weightNum <= 0) return null;
+    if (indication.doseUnit === 'fixed-by-weight') {
+      return calculateDoseMg(indication, weightNum, null);
+    }
     const d = parseFloat(doseValue);
-    if (!indication || !w || w <= 0 || Number.isNaN(d)) return null;
-    return calculateDoseMg(indication, w, d);
-  }, [indication, weight, doseValue]);
+    if (Number.isNaN(d)) return null;
+    return calculateDoseMg(indication, weightNum, d);
+  }, [indication, weightNum, doseValue]);
 
   const concentrations = useMemo(() => {
     if (!drug || !indication) return {};
     return indication.concentration ?? drug.concentration ?? {};
   }, [drug, indication]);
 
-  const volumes = useMemo(() => {
-    if (!doseResult) return {};
-    const perDose = doseResult.perDose;
-    const route = indication.route;
-    if (route === 'oral') return { oral: volumeFor(perDose, concentrations.oral) };
-    if (route === 'im') return { im: volumeFor(perDose, concentrations.im) };
-    if (route === 'ev') return { ev: volumeFor(perDose, concentrations.ev) };
-    if (route === 'im_ev') {
-      return { im: volumeFor(perDose, concentrations.im), ev: volumeFor(perDose, concentrations.ev) };
-    }
-    return {};
+  const results = useMemo(() => {
+    if (!doseResult || !indication) return {};
+    const out = {};
+    (indication.route ?? []).forEach((key) => {
+      out[key] = volumeFor(doseResult.perDose, concentrations[key]);
+    });
+    return out;
   }, [doseResult, indication, concentrations]);
 
-  const isSingleDose = doseResult && (doseResult.mode === 'single' || (doseResult.mode === 'fixed' && indication?.dosesPerDay === 1 && indication?.durationDays === 1));
+  const isSingleDose = doseResult && (
+    doseResult.mode === 'single' ||
+    doseResult.mode === 'fixed-by-weight' ||
+    (doseResult.mode === 'fixed' && indication?.dosesPerDay === 1 && indication?.durationDays === 1)
+  );
+
+  // Pra drogas em UI (ex.: penicilina benzatina), mostrar o
+  // equivalente em UI ao lado do resultado em mL.
+  const showUIEquivalent = doseResult && (indication?.doseUnit === 'UI' || indication?.doseUnit === 'fixed-by-weight');
 
   const prescriptionText = useMemo(() => {
     if (!doseResult || !drug || !indication) return '';
     const lines = [`${drug.name} — ${indication.name}`];
-    ['oral', 'im', 'ev'].forEach((routeKey) => {
-      const vol = volumes[routeKey];
-      if (vol === null || vol === undefined) return;
-      const c = concentrations[routeKey];
+    (indication.route ?? []).forEach((key) => {
+      const val = results[key];
+      if (val === null || val === undefined) return;
+      const c = concentrations[key];
+      const routeType = routeTypeFromKey(key);
       lines.push('');
-      lines.push(ROUTE_NAME[routeKey]);
-      lines.push(`${drug.name} ${c?.value}${c?.unit}`);
+      lines.push(`${ROUTE_NAME[routeType]} — ${c?.presentationLabel ?? ''}`);
       if (isSingleDose) {
-        lines.push(`${round(vol)}mL — dose única`);
+        lines.push(`${round(val)} ${c?.resultUnit ?? 'mL'} — dose única${showUIEquivalent ? ` (equivalente a ${doseResult.perDose.toLocaleString('pt-BR')} UI)` : ''}`);
       } else {
         const schedule = scheduleLabel(indication.dosesPerDay);
-        lines.push(`${round(vol)}mL a cada ${schedule.split('/')[0]}h, por ${durationDays ? `${durationDays} dias` : '___ dias'}`);
+        lines.push(`${round(val)} ${c?.resultUnit ?? 'mL'} a cada ${schedule.split('/')[0]}h, por ${durationDays ? `${durationDays} dias` : '___ dias'}`);
       }
-      if (routeKey === 'ev' && c?.dilution) {
+      if (c?.reconstitution) {
+        const items = Array.isArray(c.reconstitution) ? c.reconstitution : [c.reconstitution];
+        items.forEach((r) => {
+          lines.push(`Preparo${r.vialLabel ? ` (${r.vialLabel})` : ''}: reconstituir em ${r.diluentVolume}${r.diluentUnit} de ${r.diluent}${r.finalVolume ? ` (volume final ${r.finalVolume}${r.finalVolumeUnit})` : ''}.`);
+        });
+      }
+      if (c?.dilution) {
         const volLabel = rangeLabel(c.dilution.volume, c.dilution.volumeMin, c.dilution.volumeMax, c.dilution.unit);
         const infLabel = rangeLabel(c.dilution.infusionTime, c.dilution.infusionMin, c.dilution.infusionMax, c.dilution.infusionUnit);
-        lines.push(`Diluir em ${volLabel} de ${c.dilution.diluent} e infundir em ${infLabel}.`);
+        lines.push(`Diluir em ${volLabel} de ${c.dilution.diluent}${infLabel ? ` e infundir em ${infLabel}` : ''}.`);
       }
     });
     return lines.join('\n');
-  }, [doseResult, drug, indication, volumes, concentrations, isSingleDose, durationDays]);
+  }, [doseResult, drug, indication, results, concentrations, isSingleDose, durationDays, showUIEquivalent]);
 
   const handleCopy = () => {
     if (!prescriptionText) return;
@@ -226,7 +294,7 @@ export default function AntibioticDetail() {
 
   const doseVal = parseFloat(doseValue);
   const isDoseOutOfRange =
-    !Number.isNaN(doseVal) && (doseVal < indication.doseMin || doseVal > indication.doseMax);
+    !isFixedByWeight && !Number.isNaN(doseVal) && (doseVal < indication.doseMin || doseVal > indication.doseMax);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -268,7 +336,7 @@ export default function AntibioticDetail() {
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
         {/* Inputs */}
         <div className="rounded-xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 p-5 space-y-4">
-          <div className="grid grid-cols-2 gap-3">
+          <div className={`grid gap-3 ${isFixedByWeight ? 'grid-cols-1' : 'grid-cols-2'}`}>
             <div className="space-y-1.5">
               <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Peso (kg)
@@ -282,24 +350,37 @@ export default function AntibioticDetail() {
                 className="w-full bg-card border border-border px-3 py-2.5 text-sm text-foreground focus:outline-none focus:border-emerald-500 transition-colors"
               />
             </div>
-            <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Dose ({indication.doseUnit})
-              </label>
-              <input
-                type="number"
-                inputMode="decimal"
-                value={doseValue}
-                onChange={(e) => setDoseValue(e.target.value)}
-                className={`w-full bg-card border px-3 py-2.5 text-sm text-foreground focus:outline-none transition-colors ${
-                  isDoseOutOfRange ? 'border-orange-500' : 'border-border focus:border-emerald-500'
-                }`}
-              />
-              <p className="text-xs text-muted-foreground">
-                Faixa: {indication.doseMin}–{indication.doseMax} {indication.doseUnit}
-              </p>
-            </div>
+
+            {/* Campo de dose OCULTO quando a dose é fixa por faixa de
+                peso (ex.: penicilina benzatina) — não editável. */}
+            {!isFixedByWeight && (
+              <div className="space-y-1.5">
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Dose ({indication.doseUnit})
+                </label>
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  value={doseValue}
+                  onChange={(e) => setDoseValue(e.target.value)}
+                  className={`w-full bg-card border px-3 py-2.5 text-sm text-foreground focus:outline-none transition-colors ${
+                    isDoseOutOfRange ? 'border-orange-500' : 'border-border focus:border-emerald-500'
+                  }`}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Faixa: {indication.doseMin}–{indication.doseMax} {indication.doseUnit}
+                </p>
+              </div>
+            )}
           </div>
+
+          {isFixedByWeight && doseResult?.bracket && (
+            <div className="text-xs text-muted-foreground bg-card/50 border border-border px-3 py-2 rounded-lg">
+              Faixa de peso aplicada: <span className="font-medium text-foreground">{doseResult.bracket.label}</span>
+              {' → '}
+              <span className="font-medium text-foreground">{doseResult.bracket.doseUI.toLocaleString('pt-BR')} UI</span>, dose única (não editável).
+            </div>
+          )}
 
           {!isSingleDose && (
             <div className="space-y-1.5">
@@ -328,9 +409,20 @@ export default function AntibioticDetail() {
         {/* Receita */}
         {doseResult ? (
           <div className="space-y-3">
-            <PrescriptionBlock routeKey="oral" drug={drug} indication={indication} volumeMl={volumes.oral} concentration={concentrations.oral} isSingleDose={isSingleDose} durationDays={durationDays} />
-            <PrescriptionBlock routeKey="im" drug={drug} indication={indication} volumeMl={volumes.im} concentration={concentrations.im} isSingleDose={isSingleDose} durationDays={durationDays} />
-            <PrescriptionBlock routeKey="ev" drug={drug} indication={indication} volumeMl={volumes.ev} concentration={concentrations.ev} isSingleDose={isSingleDose} durationDays={durationDays} />
+            {(indication.route ?? []).map((key) => (
+              <PrescriptionBlock
+                key={key}
+                concKey={key}
+                drug={drug}
+                indication={indication}
+                resultValue={results[key]}
+                concentration={concentrations[key]}
+                isSingleDose={isSingleDose}
+                durationDays={durationDays}
+                showUIEquivalent={showUIEquivalent}
+                uiValue={doseResult.perDose}
+              />
+            ))}
 
             <button
               onClick={handleCopy}
